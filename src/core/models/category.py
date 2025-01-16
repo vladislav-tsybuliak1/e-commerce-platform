@@ -9,6 +9,7 @@ class Category(IntIdPkMixin, Base):
     name: Mapped[str] = mapped_column(String(63), nullable=False, unique=True)
     description: Mapped[str] = mapped_column(
         Text,
-        default="",
-        server_default="",
+        nullable=True,
+        default=None,
+        server_default=None,
     )
