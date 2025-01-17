@@ -5,11 +5,11 @@ from sqlalchemy import (
     String,
     Text,
     Enum as SQLAlchemyEnum,
-    Float,
     Integer,
     ForeignKey,
     CheckConstraint,
     Boolean,
+    DOUBLE_PRECISION,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -50,11 +50,11 @@ class Product(IntIdPkMixin, Base):
         server_default="false",
     )
     stock_value: Mapped[float] = mapped_column(
-        Float(precision=2),
+        DOUBLE_PRECISION,
         nullable=False,
     )
     stock_quantity: Mapped[float] = mapped_column(
-        Float(precision=2),
+        DOUBLE_PRECISION,
         nullable=False,
     )
     price: Mapped[int] = mapped_column(Integer, nullable=False)
@@ -85,11 +85,11 @@ class Product(IntIdPkMixin, Base):
         CheckConstraint("stock_value > 0", name="stock_value_positive"),
         CheckConstraint(
             "weight_product = TRUE AND stock_quantity::FLOAT >= 0",
-            name="quantity_float_for_weight"
+            name="quantity_float_for_weight",
         ),
         CheckConstraint(
             "weight_product = FALSE AND stock_quantity::INTEGER >= 0",
-            name="quantity_int_for_items"
+            name="quantity_int_for_items",
         ),
         CheckConstraint(
             "NOT (weight_product = TRUE AND stock_unit IN ('PCS', 'BOX'))",
