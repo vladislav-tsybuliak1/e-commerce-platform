@@ -1,3 +1,4 @@
+from sqlalchemy import select, Result
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.models import Category
@@ -19,3 +20,11 @@ async def create_category(
     await session.commit()
     await session.refresh(category)
     return category
+
+
+async def get_categories(session: AsyncSession) -> list[Category]:
+    stmt = select(Category).order_by(Category.id)
+    result: Result = await session.execute(stmt)
+    categories = result.scalars().all()
+
+    return list(categories)
