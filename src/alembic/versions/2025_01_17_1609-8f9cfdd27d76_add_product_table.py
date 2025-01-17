@@ -1,8 +1,8 @@
 """Add product table
 
-Revision ID: 3c736c84102d
+Revision ID: 8f9cfdd27d76
 Revises: 271aa6c6121e
-Create Date: 2025-01-17 15:42:32.055900
+Create Date: 2025-01-17 16:09:46.261917
 
 """
 
@@ -13,7 +13,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = "3c736c84102d"
+revision: str = "8f9cfdd27d76"
 down_revision: Union[str, None] = "271aa6c6121e"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -36,8 +36,8 @@ def upgrade() -> None:
             server_default="false",
             nullable=False,
         ),
-        sa.Column("stock_value", sa.Float(precision=2), nullable=False),
-        sa.Column("stock_quantity", sa.Float(precision=2), nullable=False),
+        sa.Column("stock_value", sa.DOUBLE_PRECISION(), nullable=False),
+        sa.Column("stock_quantity", sa.DOUBLE_PRECISION(), nullable=False),
         sa.Column("price", sa.Integer(), nullable=False),
         sa.Column("category_id", sa.Integer(), nullable=False),
         sa.Column("brand_id", sa.Integer(), nullable=False),
@@ -45,9 +45,7 @@ def upgrade() -> None:
             "NOT (weight_product = TRUE AND stock_unit IN ('PCS', 'BOX'))",
             name=op.f("ck_product_weight_product_not_pcs_or_box"),
         ),
-        sa.CheckConstraint(
-            "price >= 0", name=op.f("ck_product_price_not_negative")
-        ),
+        sa.CheckConstraint("price >= 0", name=op.f("ck_product_price_not_negative")),
         sa.CheckConstraint(
             "stock_quantity >= 0",
             name=op.f("ck_product_stock_quantity_not_negative"),
@@ -77,3 +75,6 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     op.drop_table("product")
+    sa.Enum("KG", "G", "L", "ML", "PCS", "BOX", name="stockunitenum").drop(
+        op.get_bind()
+    )
