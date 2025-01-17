@@ -75,6 +75,12 @@ class Product(IntIdPkMixin, Base):
         "Brand",
         back_populates="products",
     )
+    image: Mapped[str] = mapped_column(
+        String(255),
+        nullable=True,
+        default=None,
+        server_default=None,
+    )
 
     __table_args__ = (
         CheckConstraint("price >= 0", name="price_not_negative"),
