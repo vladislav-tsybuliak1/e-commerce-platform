@@ -5,10 +5,17 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.models import db_helper, Category
 from core.schemas.category import CategoryRead, CategoryCreateUpdate
-from crud import categories as categories_crud
+from crud import categories as crud
 
 
 router = APIRouter(tags=["Categories"])
+
+
+@router.get("/", response_model=list[CategoryRead])
+async def get_categories(
+    session: AsyncSession = Depends(db_helper.session_getter),
+):
+    return await crud.get_categories(session=session)
 
 
 @router.post(
@@ -20,7 +27,7 @@ async def create_category(
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
     category_create: CategoryCreateUpdate,
 ) -> Category:
-    category = await categories_crud.create_category(
+    category = await crud.create_category(
         session=session,
         category_create=category_create,
     )
