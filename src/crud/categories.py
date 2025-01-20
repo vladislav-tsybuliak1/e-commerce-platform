@@ -43,3 +43,15 @@ async def delete_category(
 ) -> None:
     await session.delete(category)
     await session.commit()
+
+
+async def update_category(
+    session: AsyncSession,
+    category: Category,
+    category_update: CategoryCreateUpdate,
+) -> Category:
+    for attr, value in category_update.model_dump().items():
+        setattr(category, attr, value)
+    await session.commit()
+    await session.refresh(category)
+    return category
