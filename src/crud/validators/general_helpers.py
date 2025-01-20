@@ -1,5 +1,3 @@
-from typing import Type
-
 from fastapi import HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -9,7 +7,7 @@ from core.models import Base
 
 async def validate_exists(
     session: AsyncSession,
-    model: type,
+    model: type[Base],
     field_name: str,
     field_value,
     error_message: str,
@@ -31,11 +29,11 @@ async def validate_exists(
 
 async def validate_unique(
     session: AsyncSession,
-    model: Type[Base],
+    model: type[Base],
     field_name: str,
     field_value,
     error_message: str,
-    object_to_exclude: type[Base] | None = None
+    object_to_exclude: Base | None = None
 ):
     """
     Validates the uniqueness of a record in the database for the given model, field, and value.
