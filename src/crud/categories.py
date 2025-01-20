@@ -28,3 +28,10 @@ async def get_categories(session: AsyncSession) -> list[Category]:
     categories = result.scalars().all()
 
     return list(categories)
+
+
+async def get_category(
+    session: AsyncSession,
+    category_id: int,
+) -> Category | None:
+    return await session.get(Category, category_id)
