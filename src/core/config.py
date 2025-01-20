@@ -21,7 +21,7 @@ class ApiPrefix(BaseModel):
 
 class DataBaseConfig(BaseModel):
     url: PostgresDsn = "postgresql+asyncpg://user:password@localhost:5432/db"
-    echo: bool = False
+    echo: bool = True  # TODO: should be false
     echo_pool: bool = False
     pool_size: int = 50
     max_overflow: int = 10
