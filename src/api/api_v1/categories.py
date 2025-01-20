@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from core.models import db_helper, Category
 from core.schemas.category import CategoryRead, CategoryCreateUpdate
 from crud import categories as crud
+from crud.dependencies import get_category_by_id
 
 
 router = APIRouter(tags=["Categories"])
@@ -31,4 +32,11 @@ async def create_category(
         session=session,
         category_create=category_create,
     )
+    return category
+
+
+@router.get("/{category_id}", response_model=CategoryRead)
+async def get_category(
+    category: Annotated[Category, Depends(get_category_by_id)],
+):
     return category
