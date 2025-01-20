@@ -40,3 +40,11 @@ async def get_category(
     category: Annotated[Category, Depends(get_category_by_id)],
 ):
     return category
+
+
+@router.delete("/{category_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_category(
+    category: Annotated[Category, Depends(get_category_by_id)],
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+) -> None:
+    await crud.delete_category(session=session, category=category)
