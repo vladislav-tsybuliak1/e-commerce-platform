@@ -50,6 +50,10 @@ async def update_category(
     category: Category,
     category_update: CategoryCreateUpdate,
 ) -> Category:
+    await validate_category_unique_name(
+        category_name=category_update.name,
+        session=session,
+    )
     for attr, value in category_update.model_dump().items():
         setattr(category, attr, value)
     await session.commit()
