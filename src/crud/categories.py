@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.models import Category
 from core.schemas.category import CategoryCreateUpdate
-from crud.validators import validate_category_unique_name
+from crud.validators.categories import validate_category_unique_name
 
 
 async def create_category(
@@ -53,6 +53,7 @@ async def update_category(
     await validate_category_unique_name(
         category_name=category_update.name,
         session=session,
+        category_to_exclude=category,
     )
     for attr, value in category_update.model_dump().items():
         setattr(category, attr, value)
