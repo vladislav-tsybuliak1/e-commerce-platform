@@ -35,16 +35,29 @@ async def create_category(
     return category
 
 
-@router.get("/{category_id}", response_model=CategoryRead)
+@router.get("/{category_id}/", response_model=CategoryRead)
 async def get_category(
     category: Annotated[Category, Depends(get_category_by_id)],
 ):
     return category
 
 
-@router.delete("/{category_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{category_id}/", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_category(
     category: Annotated[Category, Depends(get_category_by_id)],
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
 ) -> None:
     await crud.delete_category(session=session, category=category)
+
+
+@router.put("/{category_id}/", response_model=CategoryRead)
+async def update_category(
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+    category: Annotated[Category, Depends(get_category_by_id)],
+    category_update: CategoryCreateUpdate,
+) -> Category:
+    return await crud.update_category(
+        session=session,
+        category=category,
+        category_update=category_update,
+    )
