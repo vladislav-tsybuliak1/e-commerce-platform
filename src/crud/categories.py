@@ -35,3 +35,11 @@ async def get_category(
     category_id: int,
 ) -> Category | None:
     return await session.get(Category, category_id)
+
+
+async def delete_category(
+    session: AsyncSession,
+    category: Category,
+) -> None:
+    await session.delete(category)
+    await session.commit()
