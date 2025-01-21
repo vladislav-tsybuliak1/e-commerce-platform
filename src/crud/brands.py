@@ -30,3 +30,14 @@ async def create_brand(
 
 async def get_brands(session: AsyncSession) -> list[Brand]:
     return await get_objects(session=session, model=Brand)
+
+
+async def get_brand(
+    session: AsyncSession,
+    brand_id: int,
+) -> Brand | None:
+    return await get_object(
+        session=session,
+        object_id=brand_id,
+        model=Brand,
+    )
