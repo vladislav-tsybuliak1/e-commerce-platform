@@ -20,6 +20,7 @@ async def validate_brand_exists(
 async def validate_brand_unique_name(
     session: AsyncSession,
     brand_name: str,
+    brand_to_exclude: Brand | None = None,
 ):
     await validate_unique(
         session=session,
@@ -27,4 +28,5 @@ async def validate_brand_unique_name(
         field_name="name",
         field_value=brand_name,
         error_message=f"Brand with name '{brand_name}' already exists.",
+        object_to_exclude=brand_to_exclude,
     )
