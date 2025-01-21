@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.models import Category
 from core.schemas.category import CategoryCreateUpdate
+from crud.basic_helpers import create
 from crud.validators.categories import validate_category_unique_name
 
 
@@ -15,11 +16,11 @@ async def create_category(
         session=session,
     )
 
-    category = Category(**category_create.model_dump())
-    session.add(category)
-    await session.commit()
-    await session.refresh(category)
-    return category
+    return await create(
+        session=session,
+        object_create=category_create,
+        model=Category,
+    )
 
 
 async def get_categories(session: AsyncSession) -> list[Category]:
