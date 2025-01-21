@@ -1,5 +1,6 @@
-from typing import TypeVar
+from typing import TypeVar, Annotated
 
+from fastapi import Path, HTTPException, status
 from pydantic import BaseModel
 from sqlalchemy import select, Result
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -62,3 +63,22 @@ async def update_object(
     await session.refresh(obj)
 
     return obj
+
+
+async def get_object_by_id(
+    session: AsyncSession,
+    object_id: int,
+    model: type[ModelType],
+    error_message: str,
+) -> ModelType:
+    obj = await get_object(
+        session=session,
+        object_id=object_id,
+        model=model,
+    )
+    if obj:
+        return obj
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail=error_message,
+    )
