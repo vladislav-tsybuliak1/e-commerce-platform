@@ -1,10 +1,9 @@
-from enum import Enum as PyEnum
 from typing import TYPE_CHECKING
 
 from sqlalchemy import (
     String,
     Text,
-    Enum as SQLAlchemyEnum,
+    Enum,
     Integer,
     ForeignKey,
     CheckConstraint,
@@ -15,20 +14,12 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from core.models import Base
 from core.models.mixins import IntIdPkMixin
+from utils.enums import StockUnitEnum
 
 
 if TYPE_CHECKING:
     from core.models.category import Category
     from core.models.brand import Brand
-
-
-class StockUnitEnum(str, PyEnum):
-    KG = "KG"
-    G = "G"
-    L = "L"
-    ML = "ML"
-    PCS = "PCS"
-    BOX = "BOX"
 
 
 class Product(IntIdPkMixin, Base):
@@ -40,7 +31,7 @@ class Product(IntIdPkMixin, Base):
         server_default=None,
     )
     stock_unit: Mapped[str] = mapped_column(
-        SQLAlchemyEnum(StockUnitEnum),
+        Enum(StockUnitEnum),
         nullable=False,
     )
     weight_product: Mapped[bool] = mapped_column(
