@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.models import Category
 from core.schemas.category import CategoryCreateUpdate
-from crud.basic_helpers import create_object, get_objects
+from crud.basic_helpers import create_object, get_objects, get_object
 from crud.validators.categories import validate_category_unique_name
 
 
@@ -31,7 +31,11 @@ async def get_category(
     session: AsyncSession,
     category_id: int,
 ) -> Category | None:
-    return await session.get(Category, category_id)
+    return await get_object(
+        session=session,
+        object_id=category_id,
+        model=Category,
+    )
 
 
 async def delete_category(
