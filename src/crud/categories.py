@@ -1,4 +1,3 @@
-from sqlalchemy import select, Result
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.models import Category
