@@ -32,3 +32,11 @@ async def get_objects(
     objects = result.scalars().all()
 
     return list(objects)
+
+
+async def get_object(
+    session: AsyncSession,
+    object_id: int,
+    model: type[ModelType],
+) -> ModelType | None:
+    return await session.get(model, object_id)
