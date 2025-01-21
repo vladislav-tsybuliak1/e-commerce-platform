@@ -49,3 +49,16 @@ async def delete_object(
 ) -> None:
     await session.delete(obj)
     await session.commit()
+
+
+async def update_object(
+    session: AsyncSession,
+    obj: ModelType,
+    obj_update: SchemaType,
+) -> ModelType:
+    for attr, value in obj_update.model_dump().items():
+        setattr(obj, attr, value)
+    await session.commit()
+    await session.refresh(obj)
+
+    return obj
