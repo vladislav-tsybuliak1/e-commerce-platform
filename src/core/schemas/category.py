@@ -6,7 +6,7 @@ from pydantic import BaseModel, ConfigDict
 
 class CategoryBase(BaseModel):
     name: Annotated[str, MaxLen(63)]
-    description: str | None = None
+    description: Annotated[str, MaxLen(1000)] | None = None
 
 
 class CategoryCreateUpdate(CategoryBase):
