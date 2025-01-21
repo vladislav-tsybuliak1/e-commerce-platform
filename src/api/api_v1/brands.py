@@ -47,3 +47,16 @@ async def delete_brand(
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
 ) -> None:
     await crud.delete_brand(session=session, brand=brand)
+
+
+@router.put("/{brand_id}/", response_model=BrandRead)
+async def update_brand(
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+    brand: Annotated[Brand, Depends(get_brand_by_id)],
+    brand_update: BrandCreateUpdate,
+) -> Brand:
+    return await crud.update_brand(
+        session=session,
+        brand=brand,
+        brand_update=brand_update,
+    )
