@@ -49,6 +49,12 @@ class Product(IntIdPkMixin, Base):
         nullable=False,
     )
     price: Mapped[int] = mapped_column(Integer, nullable=False)
+    image: Mapped[str] = mapped_column(
+        String(255),
+        nullable=True,
+        default=None,
+        server_default=None,
+    )
 
     # Foreign Key relationship
     category_id: Mapped[int] = mapped_column(
@@ -65,12 +71,6 @@ class Product(IntIdPkMixin, Base):
     brand: Mapped["Brand"] = relationship(
         "Brand",
         back_populates="products",
-    )
-    image: Mapped[str] = mapped_column(
-        String(255),
-        nullable=True,
-        default=None,
-        server_default=None,
     )
 
     __table_args__ = (
