@@ -41,3 +41,28 @@ async def get_brand(
         object_id=brand_id,
         model=Brand,
     )
+
+
+async def delete_brand(
+    session: AsyncSession,
+    brand: Brand,
+) -> None:
+    await delete_object(session=session, obj=brand)
+
+
+async def update_brand(
+    session: AsyncSession,
+    brand: Brand,
+    brand_update: BrandCreateUpdate,
+) -> Brand:
+    await validate_brand_unique_name(
+        session=session,
+        brand_name=brand_update.name,
+        brand_to_exclude=brand,
+    )
+
+    return await update_object(
+        session=session,
+        obj=brand,
+        obj_update=brand_update,
+    )
