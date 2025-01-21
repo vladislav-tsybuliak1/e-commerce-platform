@@ -3,7 +3,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.models import Category
 from core.schemas.category import CategoryCreateUpdate
-from crud.basic_helpers import create_object, get_objects, get_object
+from crud.basic_helpers import (
+    create_object,
+    get_objects,
+    get_object,
+    delete_object,
+)
 from crud.validators.categories import validate_category_unique_name
 
 
@@ -42,8 +47,7 @@ async def delete_category(
     session: AsyncSession,
     category: Category,
 ) -> None:
-    await session.delete(category)
-    await session.commit()
+    await delete_object(session=session, obj=category)
 
 
 async def update_category(
