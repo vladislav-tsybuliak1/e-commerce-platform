@@ -1,6 +1,7 @@
 from typing import TypeVar
 
 from pydantic import BaseModel
+from sqlalchemy import select, Result
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.models import Base
@@ -9,7 +10,7 @@ from core.models import Base
 ModelType = TypeVar("ModelType", bound=Base)
 
 
-async def create(
+async def create_object(
     session: AsyncSession,
     object_create: BaseModel,
     model: type[ModelType],
@@ -18,4 +19,16 @@ async def create(
     session.add(obj)
     await session.commit()
     await session.refresh(obj)
+
     return obj
+
+
+async def get_objects(
+    session: AsyncSession,
+    model: type[ModelType],
+) -> list[ModelType]:
+    stmt = select(model).order_by(model.id)
+    result: Result = await session.execute(stmt)
+    objects = result.scalars().all()
+
+    return list(objects)
