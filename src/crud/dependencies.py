@@ -1,24 +1,20 @@
 from typing import Annotated
 
-from fastapi import HTTPException, status
-from fastapi.params import Depends, Path
+from fastapi.params import Path, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from core.models import db_helper, Category
-from crud import categories as categories_crud
+from core.models import Category, db_helper
+from crud.basic_helpers import get_object_by_id
+
 
 
 async def get_category_by_id(
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
     category_id: Annotated[int, Path]
 ) -> Category:
-    category = await categories_crud.get_category(
+    return await get_object_by_id(
         session=session,
-        category_id=category_id,
-    )
-    if category:
-        return category
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail=f"Category {category_id} not found!",
+        object_id=category_id,
+        model=Category,
+        error_message=f"Category with ID {category_id} is not found.",
     )
