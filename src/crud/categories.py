@@ -8,6 +8,7 @@ from crud.basic_helpers import (
     get_objects,
     get_object,
     delete_object,
+    update_object,
 )
 from crud.validators.categories import validate_category_unique_name
 
@@ -60,8 +61,9 @@ async def update_category(
         session=session,
         category_to_exclude=category,
     )
-    for attr, value in category_update.model_dump().items():
-        setattr(category, attr, value)
-    await session.commit()
-    await session.refresh(category)
-    return category
+
+    return await update_object(
+        session=session,
+        obj=category,
+        obj_update=category_update,
+    )
