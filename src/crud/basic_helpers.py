@@ -8,11 +8,12 @@ from core.models import Base
 
 
 ModelType = TypeVar("ModelType", bound=Base)
+SchemaType = TypeVar("SchemaType", bound=BaseModel)
 
 
 async def create_object(
     session: AsyncSession,
-    object_create: BaseModel,
+    object_create: SchemaType,
     model: type[ModelType],
 ) -> ModelType:
     obj = model(**object_create.model_dump())
