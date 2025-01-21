@@ -40,3 +40,11 @@ async def get_object(
     model: type[ModelType],
 ) -> ModelType | None:
     return await session.get(model, object_id)
+
+
+async def delete_object(
+    session: AsyncSession,
+    obj: ModelType,
+) -> None:
+    await session.delete(obj)
+    await session.commit()
