@@ -39,3 +39,11 @@ async def get_brand(
     brand: Annotated[Brand, Depends(get_brand_by_id)],
 ):
     return brand
+
+
+@router.delete("/{brand_id}/", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_brand(
+    brand: Annotated[Brand, Depends(get_brand_by_id)],
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+) -> None:
+    await crud.delete_brand(session=session, brand=brand)
