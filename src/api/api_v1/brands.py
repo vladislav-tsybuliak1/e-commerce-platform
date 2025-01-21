@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from core.models import db_helper, Brand
 from core.schemas.brand import BrandRead, BrandCreateUpdate
 from crud import brands as crud
-
+from crud.dependencies import get_brand_by_id
 
 router = APIRouter(tags=["Brands"])
 
@@ -31,4 +31,11 @@ async def create_brand(
         session=session,
         brand_create=brand_create,
     )
+    return brand
+
+
+@router.get("/{brand_id}/", response_model=BrandRead)
+async def get_brand(
+    brand: Annotated[Brand, Depends(get_brand_by_id)],
+):
     return brand
