@@ -4,7 +4,7 @@ from fastapi.params import Path, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.models import db_helper, Category, Brand
-from crud.basic_helpers import get_object_by_id
+from utils.crud_helpers import get_object_by_id
 
 
 

@@ -2,7 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.models import Brand
 from core.schemas.brand import BrandCreateUpdate
-from crud.basic_helpers import (
+from utils.crud_helpers import (
     create_object,
     get_objects,
     get_object,
