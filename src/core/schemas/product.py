@@ -1,6 +1,7 @@
 from typing import Annotated
 
 from annotated_types import MaxLen, Gt, Ge
+from fastapi import UploadFile
 from pydantic import BaseModel, ConfigDict
 
 from utils.enums import StockUnitEnum
@@ -29,3 +30,7 @@ class ProductRead(ProductBase):
 
     id: int
     image: str | None
+
+
+class ProductImageUpload(BaseModel):
+    image: UploadFile
