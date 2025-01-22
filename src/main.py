@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 import uvicorn
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
+from fastapi.staticfiles import StaticFiles
 
 from api import router as api_router
 from core.config import settings
@@ -23,6 +24,11 @@ main_app = FastAPI(
 )
 main_app.include_router(
     api_router,
+)
+main_app.mount(
+    "/uploads",
+    StaticFiles(directory="uploads"),
+    name="uploads",
 )
 
 
