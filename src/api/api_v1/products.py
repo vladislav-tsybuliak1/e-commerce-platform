@@ -10,6 +10,13 @@ from crud import products as crud
 router = APIRouter(tags=["Products"])
 
 
+@router.get("/", response_model=list[ProductRead])
+async def get_products(
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+):
+    return await crud.get_products(session=session)
+
+
 @router.post(
     "/",
     response_model=ProductRead,
