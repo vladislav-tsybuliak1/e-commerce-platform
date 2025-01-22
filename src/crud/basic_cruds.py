@@ -1,9 +1,10 @@
-from typing import TypeVar, Annotated
+from typing import TypeVar, Annotated, Sequence
 
 from fastapi import Path, HTTPException, status
 from pydantic import BaseModel
 from sqlalchemy import select, Result
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
 
 from core.models import Base
 
@@ -28,8 +29,14 @@ async def create_object(
 async def get_objects(
     session: AsyncSession,
     model: type[ModelType],
+    related_models: Sequence[str] | None = None
 ) -> list[ModelType]:
     stmt = select(model).order_by(model.id)
+
+    if related_models:
+        for relation in related_models:
+            stmt = stmt.options(joinedload(getattr(model, relation)))
+
     result: Result = await session.execute(stmt)
     objects = result.scalars().all()
 
