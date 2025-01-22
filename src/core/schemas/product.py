@@ -15,12 +15,11 @@ class ProductBase(BaseModel):
     stock_value: Annotated[float, Gt(0)]
     stock_quantity: Annotated[float, Ge(0)]
     price: Annotated[int, Ge(0)]
-    category_id: int
-    brand_id: int
 
 
 class ProductCreateUpdate(ProductBase):
-    pass
+    category_id: int
+    brand_id: int
 
 
 class ProductRead(ProductBase):
@@ -29,7 +28,20 @@ class ProductRead(ProductBase):
     )
 
     id: int
+    image_url: str | None
+    category: str
+    brand: str
+
+
+class ProductResponse(ProductBase):
+    model_config = ConfigDict(
+        from_attributes=True,
+    )
+
+    id: int
     image: str | None
+    category_id: int
+    brand_id: int
 
 
 class ProductImageUpload(BaseModel):
