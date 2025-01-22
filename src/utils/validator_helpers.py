@@ -22,7 +22,7 @@ async def validate_exists(
     record = result.scalar_one_or_none()
     if record is None:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail=error_message,
         )
 
