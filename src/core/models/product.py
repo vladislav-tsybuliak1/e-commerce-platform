@@ -81,14 +81,6 @@ class Product(IntIdPkMixin, Base):
         ),
         CheckConstraint("stock_value > 0", name="stock_value_positive"),
         CheckConstraint(
-            "weight_product = TRUE AND stock_quantity::FLOAT >= 0",
-            name="quantity_float_for_weight",
-        ),
-        CheckConstraint(
-            "weight_product = FALSE AND stock_quantity::INTEGER >= 0",
-            name="quantity_int_for_items",
-        ),
-        CheckConstraint(
             "NOT (weight_product = TRUE AND stock_unit IN ('PCS', 'BOX'))",
             name="weight_product_not_pcs_or_box",
         ),
