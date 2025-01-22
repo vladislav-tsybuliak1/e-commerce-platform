@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.models import Brand
-from utils.validator_helpers import validate_exists, validate_unique
+from crud.validators.basic_validators import validate_exists, validate_unique
 
 
 async def validate_brand_exists(

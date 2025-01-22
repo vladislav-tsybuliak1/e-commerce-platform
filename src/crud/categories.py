@@ -2,7 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.models import Category
 from core.schemas.category import CategoryCreateUpdate
-from utils.crud_helpers import (
+from crud.basic_cruds import (
     create_object,
     get_objects,
     get_object,

@@ -5,7 +5,7 @@ from core.schemas.product import ProductCreateUpdate
 from crud.validators.brands import validate_brand_exists
 from crud.validators.categories import validate_category_exists
 from crud.validators.products import validate_product_stock_unit
-from utils.crud_helpers import create_object
+from crud.basic_cruds import create_object
 
 
 async def create_product(
