@@ -30,4 +30,8 @@ async def create_product(
 
 
 async def get_products(session: AsyncSession) -> list[Product]:
-    return await get_objects(session=session, model=Product)
+    return await get_objects(
+        session=session,
+        model=Product,
+        related_models=["category", "brand"],
+    )
