@@ -5,7 +5,7 @@ from core.schemas.product import ProductCreateUpdate
 from crud.validators.brands import validate_brand_exists
 from crud.validators.categories import validate_category_exists
 from crud.validators.products import validate_product_stock_unit
-from crud.basic_cruds import create_object
+from crud.basic_cruds import create_object, get_objects
 
 
 async def create_product(
@@ -27,3 +27,7 @@ async def create_product(
         object_create=product_create,
         model=Product,
     )
+
+
+async def get_products(session: AsyncSession) -> list[Product]:
+    return await get_objects(session=session, model=Product)
