@@ -1,7 +1,7 @@
 from typing import Annotated, cast
 from urllib.parse import urljoin
 
-from fastapi import APIRouter, status, Depends, Request
+from fastapi import APIRouter, status, Depends, Request, UploadFile, File
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.models import db_helper, Product
@@ -112,3 +112,26 @@ async def update_product(
         product=product,
         product_update=product_update,
     )
+
+
+@router.post("/{product_id}/upload-image/")
+async def upload_product_image(
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+    product: Annotated[Product, Depends(get_product_by_id)],
+    request: Request,
+    image: UploadFile = File(
+        ...,
+        description="The image file to upload (only png, jpeg, jpg are allowed)",
+        media_type="image/jpeg, image/png",
+    ),
+):
+    file_path = await crud.upload_product_image(
+        session=session,
+        product=product,
+        image=image,
+    )
+
+    base_url = str(request.base_url)
+    image_url = urljoin(base_url, file_path)
+
+    return {"message": "Image uploaded successfully", "file_path": image_url}
