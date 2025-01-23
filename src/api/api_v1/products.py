@@ -135,3 +135,17 @@ async def upload_product_image(
     image_url = urljoin(base_url, file_path)
 
     return {"message": "Image uploaded successfully", "file_path": image_url}
+
+
+@router.delete(
+"/{product_id}/delete-image/",
+    status_code=status.HTTP_204_NO_CONTENT
+)
+async def delete_product_image(
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+    product: Annotated[Product, Depends(get_product_by_id)],
+):
+    await crud.delete_product_image(
+        session=session,
+        product=product,
+    )
