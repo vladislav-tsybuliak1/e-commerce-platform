@@ -10,6 +10,7 @@ from crud.validators.categories import validate_category_exists
 from crud.validators.products import (
     validate_product_stock_unit,
     validate_image_content_type,
+    validate_product_has_image,
 )
 from crud.basic_cruds import (
     create_object,
@@ -124,3 +125,18 @@ async def upload_product_image(
     await session.refresh(product)
 
     return str(product.image)
+
+
+async def delete_product_image(
+    session: AsyncSession,
+    product: Product,
+):
+    validate_product_has_image(product)
+
+    if os.path.exists(product.image):
+        os.remove(product.image)
+
+    product.image = None
+    session.add(product)
+    await session.commit()
+    await session.refresh(product)
