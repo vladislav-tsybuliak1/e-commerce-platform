@@ -10,6 +10,7 @@ from crud.basic_cruds import (
     get_objects,
     get_object,
     delete_object,
+    update_object,
 )
 
 
@@ -59,3 +60,25 @@ async def delete_product(
     product: Product,
 ) -> None:
     await delete_object(session=session, obj=product)
+
+
+async def update_product(
+    session: AsyncSession,
+    product: Product,
+    product_update: ProductCreateUpdate,
+) -> Product:
+    await validate_category_exists(
+        session=session,
+        category_id=product_update.category_id,
+    )
+    await validate_brand_exists(
+        session=session,
+        brand_id=product_update.brand_id,
+    )
+    validate_product_stock_unit(product_create_update=product_update)
+
+    return await update_object(
+        session=session,
+        obj=product,
+        obj_update=product_update,
+    )
