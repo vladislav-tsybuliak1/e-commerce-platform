@@ -99,3 +99,16 @@ async def delete_product(
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
 ) -> None:
     await crud.delete_product(session=session, product=product)
+
+
+@router.put("/{product_id}/", response_model=ProductResponse)
+async def update_product(
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+    product: Annotated[Product, Depends(get_product_by_id)],
+    product_update: ProductCreateUpdate,
+):
+    return await crud.update_product(
+        session=session,
+        product=product,
+        product_update=product_update,
+    )
