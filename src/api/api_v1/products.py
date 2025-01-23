@@ -91,3 +91,11 @@ async def get_product(
         category=product.category.name,
         brand=product.brand.name,
     )
+
+
+@router.delete("/{product_id}/", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_product(
+    product: Annotated[Product, Depends(get_product_by_id)],
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+) -> None:
+    await crud.delete_product(session=session, product=product)
