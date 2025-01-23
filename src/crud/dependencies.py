@@ -32,7 +32,7 @@ async def get_brand_by_id(
     )
 
 
-async def get_product_by_id(
+async def get_product_by_id_with_related_models(
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
     product_id: Annotated[int, Path]
 ) -> Product:
@@ -42,4 +42,16 @@ async def get_product_by_id(
         model=Product,
         error_message=f"Product with ID {product_id} is not found.",
         related_models=["category", "brand"]
+    )
+
+
+async def get_product_by_id(
+    session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+    product_id: Annotated[int, Path]
+) -> Product:
+    return await get_object_by_id(
+        session=session,
+        object_id=product_id,
+        model=Product,
+        error_message=f"Product with ID {product_id} is not found.",
     )

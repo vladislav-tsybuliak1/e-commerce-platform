@@ -11,7 +11,10 @@ from core.schemas.product import (
     ProductResponse,
 )
 from crud import products as crud
-from crud.dependencies import get_product_by_id
+from crud.dependencies import (
+    get_product_by_id,
+    get_product_by_id_with_related_models,
+)
 from utils.enums import StockUnitEnum
 
 
@@ -70,7 +73,12 @@ async def create_product(
 
 @router.get("/{product_id}/", response_model=ProductRead)
 async def get_product(
-    product: Annotated[Product, Depends(get_product_by_id)],
+    product: Annotated[
+        Product,
+        Depends(
+            get_product_by_id_with_related_models,
+        ),
+    ],
     request: Request,
 ):
     base_url = str(request.base_url)
@@ -137,10 +145,7 @@ async def upload_product_image(
     return {"message": "Image uploaded successfully", "file_path": image_url}
 
 
-@router.delete(
-"/{product_id}/delete-image/",
-    status_code=status.HTTP_204_NO_CONTENT
-)
+@router.delete("/{product_id}/delete-image/", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_product_image(
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
     product: Annotated[Product, Depends(get_product_by_id)],
