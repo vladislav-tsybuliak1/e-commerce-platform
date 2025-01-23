@@ -85,11 +85,13 @@ async def get_object_by_id(
     object_id: int,
     model: type[ModelType],
     error_message: str,
+    related_models: Sequence[str] | None = None,
 ) -> ModelType:
     obj = await get_object(
         session=session,
         object_id=object_id,
         model=model,
+        related_models=related_models,
     )
     if obj:
         return obj
