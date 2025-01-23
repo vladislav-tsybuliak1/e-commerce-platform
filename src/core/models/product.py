@@ -24,7 +24,7 @@ if TYPE_CHECKING:
 
 class Product(IntIdPkMixin, Base):
     name: Mapped[str] = mapped_column(String(255), nullable=False)
-    description: Mapped[str] = mapped_column(
+    description: Mapped[str | None] = mapped_column(
         Text,
         nullable=True,
         default=None,
@@ -49,7 +49,7 @@ class Product(IntIdPkMixin, Base):
         nullable=False,
     )
     price: Mapped[int] = mapped_column(Integer, nullable=False)
-    image: Mapped[str] = mapped_column(
+    image: Mapped[str | None] = mapped_column(
         String(255),
         nullable=True,
         default=None,

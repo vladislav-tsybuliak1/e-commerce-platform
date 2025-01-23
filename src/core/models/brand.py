@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 class Brand(IntIdPkMixin, Base):
     name: Mapped[str] = mapped_column(String(63), nullable=False, unique=True)
-    description: Mapped[str] = mapped_column(
+    description: Mapped[str | None] = mapped_column(
         Text,
         nullable=True,
         default=None,
