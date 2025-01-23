@@ -58,10 +58,13 @@ class Product(IntIdPkMixin, Base):
 
     # Foreign Key relationship
     category_id: Mapped[int] = mapped_column(
-        ForeignKey("category.id"),
+        ForeignKey("category.id", ondelete="RESTRICT"),
         nullable=False,
     )
-    brand_id: Mapped[int] = mapped_column(ForeignKey("brand.id"), nullable=False)
+    brand_id: Mapped[int] = mapped_column(
+        ForeignKey("brand.id", ondelete="RESTRICT"),
+        nullable=False,
+    )
 
     # Relationships
     category: Mapped["Category"] = relationship(
