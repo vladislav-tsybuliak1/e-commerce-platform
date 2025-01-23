@@ -69,6 +69,10 @@ async def delete_product(
     session: AsyncSession,
     product: Product,
 ) -> None:
+    if product.image:
+        if os.path.exists(product.image):
+            os.remove(product.image)
+
     await delete_object(session=session, obj=product)
 
 
