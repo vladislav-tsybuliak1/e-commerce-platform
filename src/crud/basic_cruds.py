@@ -47,8 +47,16 @@ async def get_object(
     session: AsyncSession,
     object_id: int,
     model: type[ModelType],
+    related_models: Sequence[str] | None = None,
 ) -> ModelType | None:
-    return await session.get(model, object_id)
+    stmt = select(model).where(model.id == object_id)
+    if related_models:
+        for relation in related_models:
+            stmt = stmt.options(joinedload(getattr(model, relation)))
+
+    result: Result = await session.execute(stmt)
+
+    return result.scalar_one_or_none()
 
 
 async def delete_object(
