@@ -20,7 +20,7 @@ async def validate_category_exists(
 async def validate_category_unique_name(
     session: AsyncSession,
     category_name: str,
-    category_to_exclude: Category | None = None
+    category_to_exclude: Category | None = None,
 ):
     await validate_unique(
         session=session,

@@ -1,6 +1,8 @@
+from fastapi import HTTPException, status
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from core.models import Category
+from core.models import Category, Product
 from core.schemas.category import CategoryCreateUpdate
 from crud.basic_cruds import (
     create_object,
@@ -9,6 +11,7 @@ from crud.basic_cruds import (
     delete_object,
     update_object,
 )
+from crud.validators.basic_validators import check_associated_products
 from crud.validators.categories import validate_category_unique_name
 
 
@@ -47,6 +50,12 @@ async def delete_category(
     session: AsyncSession,
     category: Category,
 ) -> None:
+    await check_associated_products(
+        session=session,
+        model=Category,
+        field_name="category_id",
+        value=category.id,
+    )
     await delete_object(session=session, obj=category)
 
 

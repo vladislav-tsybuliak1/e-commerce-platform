@@ -1,6 +1,8 @@
+from fastapi import HTTPException, status
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from core.models import Brand
+from core.models import Brand, Product
 from core.schemas.brand import BrandCreateUpdate
 from crud.basic_cruds import (
     create_object,
@@ -9,6 +11,7 @@ from crud.basic_cruds import (
     delete_object,
     update_object,
 )
+from crud.validators.basic_validators import check_associated_products
 from crud.validators.brands import validate_brand_unique_name
 
 
@@ -47,6 +50,12 @@ async def delete_brand(
     session: AsyncSession,
     brand: Brand,
 ) -> None:
+    await check_associated_products(
+        session=session,
+        model=Brand,
+        field_name="brand_id",
+        value=brand.id,
+    )
     await delete_object(session=session, obj=brand)
 
 
