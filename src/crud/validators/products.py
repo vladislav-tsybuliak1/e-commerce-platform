@@ -25,3 +25,10 @@ def validate_product_has_image(product: Product):
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Product does not have image.",
         )
+
+def validate_product_does_not_have_image(product: Product):
+    if product.image:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Product already has image.",
+        )
