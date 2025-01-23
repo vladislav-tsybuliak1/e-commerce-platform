@@ -6,8 +6,6 @@ from PIL import Image
 def resize_image(temp_path: str, file_path: str, max_file_size: int) -> None:
     current_size = os.path.getsize(temp_path)
 
-    print("current_size = ", current_size)
-
     if current_size > max_file_size:
         with Image.open(temp_path) as img:
             width, height = img.size
@@ -17,8 +15,6 @@ def resize_image(temp_path: str, file_path: str, max_file_size: int) -> None:
             new_height = int(height * scaling_factor)
             resized_img = img.resize((new_width, new_height))
             resized_img.save(file_path)
-            print("new_size = ", resized_img.size)
-
     else:
         os.rename(temp_path, file_path)
 
