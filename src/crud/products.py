@@ -5,7 +5,12 @@ from core.schemas.product import ProductCreateUpdate
 from crud.validators.brands import validate_brand_exists
 from crud.validators.categories import validate_category_exists
 from crud.validators.products import validate_product_stock_unit
-from crud.basic_cruds import create_object, get_objects, get_object
+from crud.basic_cruds import (
+    create_object,
+    get_objects,
+    get_object,
+    delete_object,
+)
 
 
 async def create_product(
@@ -47,3 +52,10 @@ async def get_product(
         model=Product,
         related_models=["category", "brand"],
     )
+
+
+async def delete_product(
+    session: AsyncSession,
+    product: Product,
+) -> None:
+    await delete_object(session=session, obj=product)
