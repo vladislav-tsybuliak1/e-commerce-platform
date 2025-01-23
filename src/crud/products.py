@@ -11,6 +11,7 @@ from crud.validators.products import (
     validate_product_stock_unit,
     validate_image_content_type,
     validate_product_has_image,
+    validate_product_does_not_have_image,
 )
 from crud.basic_cruds import (
     create_object,
@@ -99,6 +100,7 @@ async def upload_product_image(
     image: UploadFile,
     max_file_size: int = 1 * 1024 * 1024,  # 1 MB
 ) -> str:
+    validate_product_does_not_have_image(product)
     validate_image_content_type(image)
 
     # Generate file_path
