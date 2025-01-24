@@ -1,13 +1,13 @@
 services:
   e-commerce-platform:
     build:
-      context: .
+      context: ./backend
     env_file:
-      - src/.env
+      - ./backend/src/.env
     ports:
       - "8000:8000"
     volumes:
-      - ./:/app
+      - ./backend:/app
     restart: always
     command: >
       sh -c "cd src &&
@@ -20,7 +20,7 @@ services:
     image: postgres:16.0-alpine3.17
     restart: always
     env_file:
-      - src/.env
+      - ./backend/src/.env
     ports:
       - "5432:5432"
     volumes:
