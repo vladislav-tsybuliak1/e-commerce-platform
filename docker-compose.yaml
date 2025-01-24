@@ -1,5 +1,5 @@
 services:
-  e-commerce-platform:
+  e_commerce_platform_backend:
     build:
       context: ./backend
     env_file:
@@ -16,6 +16,19 @@ services:
     depends_on:
       - db
 
+  e_commerce_platform_frontend:
+    build:
+      context: ./frontend
+    env_file:
+      - ./frontend/.env
+    depends_on:
+      - e_commerce_platform_backend
+    volumes:
+      - ./frontend:/app
+      - node_modules:/app/node_modules
+    ports:
+      - "8080:8080"
+
   db:
     image: postgres:16.0-alpine3.17
     restart: always
@@ -29,3 +42,4 @@ services:
 
 volumes:
   data:
+  node_modules:
