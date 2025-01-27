@@ -1,12 +1,7 @@
 import {Product} from '../types';
+import {getData} from '../utils/httpClient';
 
-export function getProducts(): Promise<Product[]> {
-  return fetch('http://127.0.0.1:8000/api/v1/products/')
-    .then((response) => {
-      if (!response.ok) {
-
-      }
-      return response.json();
-    })
+export function getProducts() {
+  return getData<Product[]>('/products/')
     .then((products) => (products));
 }
