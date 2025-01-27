@@ -1,18 +1,26 @@
-import React from 'react';
-import productsFromServer from './api/products.json';
-import {ProductCard} from "./components/ProductCard";
+import React, {useEffect, useState} from 'react';
+import {ProductCard} from './components/ProductCard';
+import {Product} from './types';
+import {getProducts} from './services/product.tsx';
 
 export const App: React.FC = () => {
+  const [products, setProducts] = useState<Product[]>([])
+
+  useEffect(() => {
+      getProducts().then(setProducts)
+    }, []
+  )
   return (
     <div>
       <p>Products</p>
       <div className="grid is-col-min-11">
-        {productsFromServer.map(product => (
-          <div className="cell">
-            <ProductCard key={product.id} product={product}/>
+        {products.map(product => (
+          <div className="cell" key={product.id}>
+            <ProductCard product={product}/>
           </div>
         ))}
       </div>
+
     </div>
   );
 };
