@@ -1,5 +1,5 @@
 import React from 'react';
-import productsFromServer from './products.json';
+import productsFromServer from './api/products.json';
 import {ProductCard} from "./components/ProductCard";
 
 export const App: React.FC = () => {

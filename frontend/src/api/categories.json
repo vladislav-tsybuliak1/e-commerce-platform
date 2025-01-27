@@ -1,0 +1,22 @@
+[
+  {
+    "name": "Wine",
+    "description": null,
+    "id": 1
+  },
+  {
+    "name": "Water",
+    "description": null,
+    "id": 2
+  },
+  {
+    "name": "Chocholate",
+    "description": null,
+    "id": 3
+  },
+  {
+    "name": "Vegetables",
+    "description": null,
+    "id": 4
+  }
+]
