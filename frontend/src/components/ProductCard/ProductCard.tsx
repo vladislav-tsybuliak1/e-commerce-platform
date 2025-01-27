@@ -17,17 +17,16 @@ export const ProductCard: React.FC<Props> = ({product}) => {
         </figure>
       </div>
       <div className="card-content">
-        <p className="title is-5">
-          {product.name}
+        <p className="title is-4">
+          {product.price / 100} ₴
         </p>
-        <p
-          className="subtitle is-6">{product.stock_value} {product.stock_unit}
+        <p className="subtitle is-5">
+          {product.name.slice(0, 40)}{product.name.length > 40 && '...'}
+        </p>
+        <p className="title is-6">
+          {product.stock_value}{product.stock_unit.toLowerCase()}
         </p>
 
-        <div className="content">
-          <p className="subtitle is-5">Price: {product.price / 100} ₴</p>
-          <p className="subtitle is-6">Stock: {product.stock_quantity}</p>
-        </div>
       </div>
     </div>
   );
