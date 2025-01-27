@@ -1,6 +1,6 @@
 import React from 'react';
 import productsFromServer from './products.json';
-import {ProductCard} from "./components/ProductCard/ProductCard.tsx";
+import {ProductCard} from "./components/ProductCard";
 
 export const App: React.FC = () => {
   return (
