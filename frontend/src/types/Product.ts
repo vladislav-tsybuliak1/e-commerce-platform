@@ -1,8 +1,10 @@
+import {StockUnit} from './StockUnit.ts';
+
 export interface Product {
   id: number;
   name: string;
   description: string | null;
-  stock_unit: string;
+  stock_unit: StockUnit;
   weight_product: boolean;
   stock_value: number;
   stock_quantity: number;
