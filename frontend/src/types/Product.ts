@@ -1,4 +1,4 @@
-import {StockUnit} from './StockUnit.ts';
+import {StockUnit} from './StockUnit';
 
 export interface Product {
   id: number;
@@ -10,6 +10,6 @@ export interface Product {
   stock_quantity: number;
   price: number;
   image_url: string | null;
-  category: string;
-  brand: string;
+  category_id: string;
+  brand_id: string;
 }
