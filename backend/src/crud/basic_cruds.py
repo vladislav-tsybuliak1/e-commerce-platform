@@ -1,8 +1,8 @@
-from typing import TypeVar, Annotated, Sequence
+from typing import TypeVar, Sequence
 
-from fastapi import Path, HTTPException, status
+from fastapi import HTTPException, status
 from pydantic import BaseModel
-from sqlalchemy import select, Result
+from sqlalchemy import select, Result, desc, asc
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
@@ -29,9 +29,22 @@ async def create_object(
 async def get_objects(
     session: AsyncSession,
     model: type[ModelType],
-    related_models: Sequence[str] | None = None
+    order_by: Sequence[str] | None = None,
+    related_models: Sequence[str] | None = None,
 ) -> list[ModelType]:
-    stmt = select(model).order_by(model.id)
+    stmt = select(model)
+
+    if order_by:
+        order_clauses = []
+        for field in order_by:
+            if field.startswith("-"):
+                field_name = field[1:]
+                order_clauses.append(desc(getattr(model, field_name)))
+            else:
+                order_clauses.append(asc(getattr(model, field)))
+        stmt = stmt.order_by(*order_clauses)
+    else:
+        stmt = stmt.order_by(model.id)
 
     if related_models:
         for relation in related_models:
