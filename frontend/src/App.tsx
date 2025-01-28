@@ -3,6 +3,7 @@ import {Product} from './types';
 import {getProducts} from './services/product';
 import {Loader} from './components/Loader';
 import {ProductList} from './components/ProductList';
+import {ProductForm} from './components/ProductForm';
 
 export const App: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -26,25 +27,32 @@ export const App: React.FC = () => {
 
   return (
     <div>
-      <p className="title is-2">Products</p>
       <div>
-        {loading && <Loader/>}
+        <p className="title is-2">Add a new product</p>
+        <ProductForm/>
+      </div>
 
-        {!loading && products.length > 0 && (
-          <ProductList products={products}/>
-        )}
 
-        {!loading && !errorMessage && products.length === 0 && (
-          <p className="title is-5">There are no products</p>
-        )}
+      <div>
+        <p className="title is-2">Products</p>
+        <div>
+          {loading && <Loader/>}
 
-        {errorMessage && (
-          <p className="notification is-danger">
-            {errorMessage}
-            <button onClick={reload}>Reload</button>
-          </p>
-        )}
+          {!loading && products.length > 0 && (
+            <ProductList products={products}/>
+          )}
 
+          {!loading && !errorMessage && products.length === 0 && (
+            <p className="title is-5">There are no products</p>
+          )}
+
+          {errorMessage && (
+            <p className="notification is-danger">
+              {errorMessage}
+              <button onClick={reload}>Reload</button>
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );
