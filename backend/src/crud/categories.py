@@ -32,7 +32,11 @@ async def create_category(
 
 
 async def get_categories(session: AsyncSession) -> list[Category]:
-    return await get_objects(session=session, model=Category)
+    return await get_objects(
+        session=session,
+        model=Category,
+        order_by=["name"],
+    )
 
 
 async def get_category(
