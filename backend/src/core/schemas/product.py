@@ -4,6 +4,8 @@ from annotated_types import MaxLen, Gt, Ge
 from fastapi import UploadFile
 from pydantic import BaseModel, ConfigDict
 
+from core.schemas.brand import BrandRead
+from core.schemas.category import CategoryRead
 from utils.enums import StockUnitEnum
 
 
@@ -22,15 +24,26 @@ class ProductCreateUpdate(ProductBase):
     brand_id: int
 
 
-class ProductRead(ProductBase):
+class ProductListRead(ProductBase):
     model_config = ConfigDict(
         from_attributes=True,
     )
 
     id: int
     image_url: str | None
-    category: str
-    brand: str
+    category_id: int
+    brand_id: int
+
+
+class ProductDetailRead(ProductBase):
+    model_config = ConfigDict(
+        from_attributes=True,
+    )
+
+    id: int
+    image_url: str | None
+    category: CategoryRead
+    brand: BrandRead
 
 
 class ProductResponse(ProductBase):
