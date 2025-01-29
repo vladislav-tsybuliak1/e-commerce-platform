@@ -1,7 +1,47 @@
 import React, {useEffect, useState} from 'react';
+import {SubmitHandler, useForm} from 'react-hook-form';
+import {zodResolver} from '@hookform/resolvers/zod';
+import {z} from 'zod';
+import classNames from 'classnames';
+
 import {Category, Brand, StockUnit} from '../../types';
 import {getBrands} from '../../services/brand';
-import {getCategories} from '../../services/category.ts';
+import {getCategories} from '../../services/category';
+
+
+const productSchema = z.object({
+  name: z.string()
+    .min(1, 'Provide the name')
+    .max(255, 'Name must be at most 255 characters'),
+  description: z
+    .string()
+    .max(1000, 'Description must be at most 1000 characters')
+    .transform((value) => (value === undefined ? null : value)),
+  stock_unit: z.nativeEnum(StockUnit, {message: 'Make a selection'}),
+  weight_product: z.boolean(),
+  stock_value: z.coerce
+    .number({message: 'Stock value must be a valid number'})
+    .gt(0, 'Stock value must be greater than 0'),
+  stock_quantity: z.coerce
+    .number({message: 'Stock quantity must be a valid number'})
+    .gte(0, 'Stock quantity must be at least 0'),
+  price: z.coerce
+    .number({message: 'Price must be a valid number'})
+    .gte(0, 'Price must be at least 0')
+    .transform((price) => price * 100),
+  category_id: z.coerce.number().int().positive('Make a selection'),
+  brand_id: z.coerce.number().int().positive('Make a selection'),
+}).superRefine((data, ctx) => {
+  if (!data.weight_product && !Number.isInteger(data.stock_quantity)) {
+    ctx.addIssue({
+      path: ['stock_quantity'],
+      message: 'Stock quantity must be an integer if it is not a weight product',
+      code: z.ZodIssueCode.custom,
+    });
+  }
+});
+
+type FormFields = z.infer<typeof productSchema>;
 
 export const ProductForm: React.FC = React.memo(
   () => {
@@ -9,6 +49,24 @@ export const ProductForm: React.FC = React.memo(
     const [brands, setBrands] = useState<Brand[]>([]);
 
     const units = Object.values(StockUnit);
+
+    const {
+      register,
+      handleSubmit,
+      setError,
+      formState: {errors, isSubmitting},
+    } = useForm<FormFields>({
+      resolver: zodResolver(productSchema),
+    });
+
+    const onSubmit: SubmitHandler<FormFields> = async (data) => {
+      try {
+        await new Promise((resolve) => setTimeout(resolve, 1000))
+        console.log(data);
+      } catch (error) {
+        setError('root', {message: String(error)})
+      }
+    };
 
     useEffect(() => {
         getBrands()
@@ -26,18 +84,26 @@ export const ProductForm: React.FC = React.memo(
       <form
         action=""
         className="box"
+        onSubmit={handleSubmit(onSubmit)}
       >
+
         <div className="field">
           <label className="label" htmlFor="product-name">Name</label>
 
           <div className="control">
             <input
-              className="input"
+              {...register('name')}
+              className={classNames('input', {
+                'is-danger': errors.name
+              })}
               id="product-name"
               type="text"
               placeholder="Enter product name..."
             />
           </div>
+          {errors.name && (
+            <p className="help is-danger">{errors.name.message}</p>
+          )}
         </div>
 
         <div className="field">
@@ -50,11 +116,17 @@ export const ProductForm: React.FC = React.memo(
 
           <div className="control">
           <textarea
-            className="textarea"
+            {...register('description')}
+            className={classNames('textarea', {
+              'is-danger': errors.description
+            })}
             id="product-description"
             placeholder="Enter product description..."
           />
           </div>
+          {errors.description && (
+            <p className="help is-danger">{errors.description.message}</p>
+          )}
         </div>
 
         <div className="field">
@@ -67,12 +139,18 @@ export const ProductForm: React.FC = React.memo(
 
           <div className="control">
             <input
-              className="input"
+              {...register('stock_value')}
+              className={classNames('input', {
+                'is-danger': errors.stock_value
+              })}
               id="product-stock-value"
-              type="number"
+              type="text"
               placeholder="Enter value..."
             />
           </div>
+          {errors.stock_value && (
+            <p className="help is-danger">{errors.stock_value.message}</p>
+          )}
         </div>
 
         <div className="field">
@@ -84,8 +162,13 @@ export const ProductForm: React.FC = React.memo(
           </label>
 
           <div className="control has-icons-left">
-            <div className="select is-rounded">
+            <div
+              className={classNames('select is-rounded', {
+                'is-danger': errors.stock_unit
+              })}
+            >
               <select
+                {...register('stock_unit')}
                 id="product-stock-unit"
               >
                 <option value="">Select unit</option>
@@ -101,6 +184,10 @@ export const ProductForm: React.FC = React.memo(
               <i className="fas fa-scale-balanced"></i>
             </div>
           </div>
+
+          {errors.stock_unit && (
+            <p className="help is-danger">{errors.stock_unit.message}</p>
+          )}
         </div>
 
         <div className="field">
@@ -109,12 +196,17 @@ export const ProductForm: React.FC = React.memo(
               className="checkbox"
             >
               <input
+                {...register('weight_product')}
                 type="checkbox"
               />
               {` Weight product`}
             </label>
           </div>
           <p className="help">(only for kg, g, l, or ml)</p>
+
+          {errors.weight_product && (
+            <p className="help is-danger">{errors.weight_product.message}</p>
+          )}
         </div>
 
         <div className="field">
@@ -127,15 +219,24 @@ export const ProductForm: React.FC = React.memo(
 
           <div className="control has-icons-left">
             <input
-              className="input"
+              {...register('stock_quantity')}
+              className={classNames('input', {
+                'is-danger': errors.stock_quantity
+              })}
               id="product-stock-quantity"
-              type="number"
+              type="text"
               placeholder="Enter quantity value..."
             />
             <div className="icon is-small is-left">
               <i className="fas fa-warehouse"></i>
             </div>
           </div>
+
+          <p className="help">(default value is 0)</p>
+
+          {errors.stock_quantity && (
+            <p className="help is-danger">{errors.stock_quantity.message}</p>
+          )}
         </div>
 
         <div className="field">
@@ -148,15 +249,24 @@ export const ProductForm: React.FC = React.memo(
 
           <div className="control has-icons-left">
             <input
-              className="input"
+              {...register('price')}
+              className={classNames('input', {
+                'is-danger': errors.price
+              })}
               id="product-price"
-              type="number"
+              type="text"
               placeholder="Enter price..."
             />
             <div className="icon is-small is-left">
               <i className="fas fa-coins"></i>
             </div>
           </div>
+
+          <p className="help">(default value is 0)</p>
+
+          {errors.price && (
+            <p className="help is-danger">{errors.price.message}</p>
+          )}
         </div>
 
         <div className="field">
@@ -168,8 +278,13 @@ export const ProductForm: React.FC = React.memo(
           </label>
 
           <div className="control has-icons-left">
-            <div className="select is-rounded">
+            <div
+              className={classNames('select is-rounded', {
+                'is-danger': errors.category_id
+              })}
+            >
               <select
+                {...register('category_id')}
                 id="product-category-id"
               >
                 <option value="">Select category</option>
@@ -188,6 +303,10 @@ export const ProductForm: React.FC = React.memo(
               <i className="fas fa-table"></i>
             </div>
           </div>
+
+          {errors.category_id && (
+            <p className="help is-danger">{errors.category_id.message}</p>
+          )}
         </div>
 
         <div className="field">
@@ -199,8 +318,13 @@ export const ProductForm: React.FC = React.memo(
           </label>
 
           <div className="control has-icons-left">
-            <div className="select is-rounded">
+            <div
+              className={classNames('select is-rounded', {
+                'is-danger': errors.brand_id
+              })}
+            >
               <select
+                {...register('brand_id')}
                 id="product-brand-id"
               >
                 <option value="">Select brand</option>
@@ -219,11 +343,16 @@ export const ProductForm: React.FC = React.memo(
               <i className="fas fa-trademark"></i>
             </div>
           </div>
+
+          {errors.brand_id && (
+            <p className="help is-danger">{errors.brand_id.message}</p>
+          )}
         </div>
 
         <div className="buttons">
-          <button type="submit" className="button is-link">
-            Submit
+          <button disabled={isSubmitting} type="submit"
+                  className="button is-link">
+            {isSubmitting ? 'Loading...' : 'Submit'}
           </button>
 
           <button type="reset" className="button is-link is-light">
@@ -231,6 +360,9 @@ export const ProductForm: React.FC = React.memo(
           </button>
         </div>
 
+        {errors.root && (
+          <p className="help is-danger">{errors.root.message}</p>
+        )}
       </form>
     );
   }
