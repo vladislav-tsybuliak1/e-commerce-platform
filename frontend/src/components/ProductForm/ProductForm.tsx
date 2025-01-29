@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
-import {SubmitHandler, useForm} from 'react-hook-form';
+import {SubmitHandler, useForm, Controller} from 'react-hook-form';
+import ReactSelect from 'react-select';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {z} from 'zod';
 import classNames from 'classnames';
@@ -8,6 +9,7 @@ import {Category, Brand, StockUnit} from '../../types';
 import {getBrands} from '../../services/brand';
 import {getCategories} from '../../services/category';
 
+import './ProductForm.scss';
 
 const productSchema = z.object({
   name: z.string()
@@ -34,7 +36,7 @@ const productSchema = z.object({
     .gte(0, 'Price must be at least 0')
     .transform((price) => price * 100),
   category_id: z.coerce.number().int().positive('Make a selection'),
-  brand_id: z.coerce.number().int().positive('Make a selection'),
+  brand_id: z.coerce.number({message: 'Make a selection'}).int().positive('Make a selection'),
 }).superRefine((data, ctx) => {
   // If weight_product is false, stock_quantity must be an integer
   if (!data.weight_product && !Number.isInteger(data.stock_quantity)) {
@@ -46,7 +48,7 @@ const productSchema = z.object({
   }
 
   // Validation: If weight_product is true, stock_unit must be in ["KG", "G", "L", "ML"]
-  if (data.weight_product && ["PCS", "BOX"].includes(data.stock_unit)) {
+  if (data.weight_product && ['PCS', 'BOX'].includes(data.stock_unit)) {
     ctx.addIssue({
       path: ['stock_unit'],
       message: 'Weight product unit should be \'KG\', \'G\', \'L\', or \'ML\'',
@@ -68,6 +70,8 @@ export const ProductForm: React.FC = React.memo(
       register,
       handleSubmit,
       setError,
+      control,
+      watch,
       formState: {errors, isSubmitting},
     } = useForm<FormFields>({
       resolver: zodResolver(productSchema),
@@ -177,7 +181,7 @@ export const ProductForm: React.FC = React.memo(
 
           <div className="control has-icons-left">
             <div
-              className={classNames('select is-rounded', {
+              className={classNames('select', {
                 'is-danger': errors.stock_unit
               })}
             >
@@ -185,7 +189,8 @@ export const ProductForm: React.FC = React.memo(
                 {...register('stock_unit')}
                 id="product-stock-unit"
               >
-                <option value="">Select unit</option>
+                <option value="" disabled={!!watch('stock_unit')}>Select unit
+                </option>
 
                 {units.map(value => (
                   <option value={value} key={value}>
@@ -293,7 +298,7 @@ export const ProductForm: React.FC = React.memo(
 
           <div className="control has-icons-left">
             <div
-              className={classNames('select is-rounded', {
+              className={classNames('select', {
                 'is-danger': errors.category_id
               })}
             >
@@ -301,7 +306,9 @@ export const ProductForm: React.FC = React.memo(
                 {...register('category_id')}
                 id="product-category-id"
               >
-                <option value="">Select category</option>
+                <option value="" disabled={!!watch('category_id')}>Select
+                  category
+                </option>
 
                 {categories.map(category => (
                   <option
@@ -324,43 +331,86 @@ export const ProductForm: React.FC = React.memo(
         </div>
 
         <div className="field">
-          <label
-            className="label"
-            htmlFor="product-brand-id"
-          >
+          <label className="label" htmlFor="product-brand-id">
             Brand
           </label>
-
-          <div className="control has-icons-left">
-            <div
-              className={classNames('select is-rounded', {
-                'is-danger': errors.brand_id
-              })}
-            >
-              <select
-                {...register('brand_id')}
-                id="product-brand-id"
-              >
-                <option value="">Select brand</option>
-
-                {brands.map(brand => (
-                  <option
-                    value={brand.id}
-                    key={brand.id}
-                  >
-                    {brand.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="icon is-small is-left">
-              <i className="fas fa-trademark"></i>
-            </div>
+          <div>
+            <Controller
+              name="brand_id"
+              control={control}
+              render={({field}) => (
+                <ReactSelect
+                  {...field}
+                  id="product-brand-id"
+                  options={brands.map((brand) => ({
+                    value: brand.id,
+                    label: brand.name,
+                  }))}
+                  placeholder="Select brand"
+                  onChange={(selectedOption) => field.onChange(selectedOption?.value ?? null)}
+                  value={
+                    brands
+                      .map((brand) => ({value: brand.id, label: brand.name}))
+                      .find(option => option.value === field.value) || null
+                  }
+                  isSearchable
+                  isClearable
+                  styles={{
+                    control: (provided, state) => ({
+                      ...provided,
+                      border: errors.brand_id
+                        ? '1px solid hsl(348, 86%, 61%)'
+                        : state.menuIsOpen
+                          ? '1px solid hsl(217, 71%, 53%)'
+                          : '1px solid #dbdbdb',
+                      transition: 'box-shadow 0.2s ease-in-out',
+                      boxShadow: errors.brand_id && state.menuIsOpen
+                        ? '0 0 0 3px hsl(348, 100%, 80%, 0.4)'
+                        : state.menuIsOpen
+                          ? '0 0 0 3px hsl(217, 71%, 53%, 0.25)'
+                          : 'none',
+                      cursor: 'pointer',
+                      '&:hover': {
+                        borderColor: errors.brand_id
+                          ? 'hsl(348, 86%, 55%)'
+                          : state.menuIsOpen
+                            ? 'hsl(217, 71%, 50%)'
+                            : '#b5b5b5'
+                      }
+                    }),
+                    placeholder: (provided) => ({
+                      ...provided,
+                      color: errors.brand_id ? 'hsl(348deg, 100%, 21%)' : 'hsl(0, 0%, 14%)',
+                    }),
+                    dropdownIndicator: (provided) => ({
+                      ...provided,
+                      color: 'hsl(217, 71%, 53%)',
+                    }),
+                    indicatorSeparator: () => ({
+                      display: 'none', // Remove the separator between the input and the arrow
+                    }),
+                    option: (provided, state) => ({
+                      ...provided,
+                      backgroundColor: state.isFocused ? 'hsl(217, 71%, 53%)' : 'transparent',
+                      color: errors.brand_id && !state.isFocused
+                        ? 'hsl(348deg, 100%, 21%)' :
+                        state.isFocused
+                          ? 'white'
+                          : 'hsl(0, 0%, 14%)',
+                      marginTop: '0',
+                    }),
+                    menu: (provided) => ({
+                      ...provided,
+                      marginTop: '0',
+                      borderRadius: '0.375rem',
+                    }),
+                  }}
+                />
+              )}
+            />
           </div>
-
-          {errors.brand_id && (
-            <p className="help is-danger">{errors.brand_id.message}</p>
-          )}
+          {errors.brand_id &&
+            <p className="help is-danger">{errors.brand_id.message}</p>}
         </div>
 
         <div className="buttons">
