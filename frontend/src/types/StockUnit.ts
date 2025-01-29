@@ -1,8 +1,8 @@
 export enum StockUnit {
-  KG = "kg",
-  G = "g",
-  L = "l",
-  ML = "ml",
-  PCS = "pcs",
-  BOX = "box",
+  KG = "KG",
+  G = "G",
+  L = "L",
+  ML = "ML",
+  PCS = "PCS",
+  BOX = "BOX",
 }

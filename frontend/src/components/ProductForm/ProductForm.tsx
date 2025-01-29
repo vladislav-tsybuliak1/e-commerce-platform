@@ -11,12 +11,16 @@ import {getCategories} from '../../services/category';
 
 const productSchema = z.object({
   name: z.string()
+    .trim()
     .min(1, 'Provide the name')
     .max(255, 'Name must be at most 255 characters'),
   description: z
     .string()
+    .trim()
     .max(1000, 'Description must be at most 1000 characters')
-    .transform((value) => (value === undefined ? null : value)),
+    .transform((value) => (
+      value === undefined || value === '' ? null : value
+    )),
   stock_unit: z.nativeEnum(StockUnit, {message: 'Make a selection'}),
   weight_product: z.boolean(),
   stock_value: z.coerce
@@ -32,10 +36,20 @@ const productSchema = z.object({
   category_id: z.coerce.number().int().positive('Make a selection'),
   brand_id: z.coerce.number().int().positive('Make a selection'),
 }).superRefine((data, ctx) => {
+  // If weight_product is false, stock_quantity must be an integer
   if (!data.weight_product && !Number.isInteger(data.stock_quantity)) {
     ctx.addIssue({
       path: ['stock_quantity'],
       message: 'Stock quantity must be an integer if it is not a weight product',
+      code: z.ZodIssueCode.custom,
+    });
+  }
+
+  // Validation: If weight_product is true, stock_unit must be in ["KG", "G", "L", "ML"]
+  if (data.weight_product && ["PCS", "BOX"].includes(data.stock_unit)) {
+    ctx.addIssue({
+      path: ['stock_unit'],
+      message: 'Weight product unit should be \'KG\', \'G\', \'L\', or \'ML\'',
       code: z.ZodIssueCode.custom,
     });
   }
@@ -175,7 +189,7 @@ export const ProductForm: React.FC = React.memo(
 
                 {units.map(value => (
                   <option value={value} key={value}>
-                    {value}
+                    {value.toLowerCase()}
                   </option>
                 ))}
               </select>
