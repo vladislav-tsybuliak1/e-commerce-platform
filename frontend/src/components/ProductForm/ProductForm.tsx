@@ -5,7 +5,7 @@ import {zodResolver} from '@hookform/resolvers/zod';
 import {z} from 'zod';
 import classNames from 'classnames';
 
-import {Category, Brand, StockUnit} from '../../types';
+import {Category, Brand, StockUnit, Product} from '../../types';
 import {getBrands} from '../../services/brand';
 import {getCategories} from '../../services/category';
 
@@ -21,7 +21,7 @@ const productSchema = z.object({
     .trim()
     .max(1000, 'Description must be at most 1000 characters')
     .transform((value) => (
-      value === undefined || value === '' ? null : value
+      value === '' ? undefined : value
     )),
   stock_unit: z.nativeEnum(StockUnit, {message: 'Make a selection'}),
   weight_product: z.boolean(),
@@ -59,8 +59,12 @@ const productSchema = z.object({
 
 type FormFields = z.infer<typeof productSchema>;
 
-export const ProductForm: React.FC = React.memo(
-  () => {
+type Props = {
+  onSubmit: (product: Product) => void;
+}
+
+export const ProductForm: React.FC<Props> = React.memo(
+  ({onSubmit}) => {
     const [categories, setCategories] = useState<Category[]>([]);
     const [brands, setBrands] = useState<Brand[]>([]);
 
@@ -72,15 +76,24 @@ export const ProductForm: React.FC = React.memo(
       setError,
       control,
       watch,
-      formState: {errors, isSubmitting},
+      reset,
+      formState: {errors, isSubmitting, isSubmitSuccessful},
     } = useForm<FormFields>({
       resolver: zodResolver(productSchema),
     });
 
-    const onSubmit: SubmitHandler<FormFields> = async (data) => {
+    const handleProductSubmit: SubmitHandler<FormFields> = async (data) => {
       try {
-        await new Promise((resolve) => setTimeout(resolve, 1000))
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+
+        const newProduct: Product = {
+          ...data,
+          id: 0,
+        };
+
+        onSubmit(newProduct);
         console.log(data);
+
       } catch (error) {
         setError('root', {message: String(error)})
       }
@@ -98,12 +111,20 @@ export const ProductForm: React.FC = React.memo(
       }, []
     );
 
+    useEffect(() => {
+      if (isSubmitSuccessful) {
+        reset();
+      }
+    }, [reset, isSubmitSuccessful])
+
+
     console.log('product form')
     return (
       <form
         action=""
         className="box"
-        onSubmit={handleSubmit(onSubmit)}
+        onSubmit={handleSubmit(handleProductSubmit)}
+        onReset={() => reset()}
       >
 
         <div className="field">
@@ -189,8 +210,9 @@ export const ProductForm: React.FC = React.memo(
               <select
                 {...register('stock_unit')}
                 id="product-stock-unit"
+                defaultValue=""
               >
-                <option value="" disabled={!!watch('stock_unit')}>Select unit
+                <option value="" disabled={String(watch('stock_unit')) !== ''}>Select unit
                 </option>
 
                 {units.map(value => (
@@ -306,8 +328,9 @@ export const ProductForm: React.FC = React.memo(
               <select
                 {...register('category_id')}
                 id="product-category-id"
+                defaultValue=""
               >
-                <option value="" disabled={!!watch('category_id')}>Select
+                <option value="" disabled={String(watch('category_id')) !== ''}>Select
                   category
                 </option>
 

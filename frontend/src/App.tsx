@@ -20,6 +20,10 @@ export const App: React.FC = () => {
     }, [updatedAt]
   )
 
+  const addProduct = (newProduct: Product) => {
+    setProducts(currentProducts => [newProduct, ...currentProducts])
+  };
+
   function reload() {
     setUpdatedAt(new Date());
     setErrorMessage('');
@@ -29,7 +33,7 @@ export const App: React.FC = () => {
     <div>
       <div>
         <p className="title is-2">Add a new product</p>
-        <ProductForm/>
+        <ProductForm onSubmit={addProduct}/>
       </div>
 
 
