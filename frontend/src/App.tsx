@@ -10,6 +10,7 @@ export const App: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [updatedAt, setUpdatedAt] = useState(new Date());
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
 
   const [counter, setCounter] = useState(0)
 
@@ -32,16 +33,37 @@ export const App: React.FC = () => {
     }, []
   );
 
+  const updateProduct = useCallback((updatedProduct: Product) => {
+      setProducts(currentProducts => {
+        const newProducts = [...currentProducts];
+        const index = newProducts.findIndex(product => product.id === updatedProduct.id);
+
+        newProducts.splice(index, 1, updatedProduct);
+
+        return newProducts;
+      })
+    }, []
+  );
+
   function reload() {
     setUpdatedAt(new Date());
     setErrorMessage('');
   }
 
+  console.log(products);
+
   return (
     <div>
       <div>
         <p className="title is-2">Add a new product</p>
-        <ProductForm onSubmit={addProduct}/>
+        {selectedProduct ? (
+          <ProductForm
+            onSubmit={updateProduct}
+            product={selectedProduct}
+            key={selectedProduct.id}/>
+        ) : (
+          <ProductForm onSubmit={addProduct}/>
+        )}
       </div>
 
       <button onClick={() => setCounter(x => x + 1)}>
@@ -55,7 +77,11 @@ export const App: React.FC = () => {
           {loading && <Loader/>}
 
           {!loading && products.length > 0 && (
-            <ProductList products={products} onDelete={deleteProduct}/>
+            <ProductList
+              products={products}
+              onDelete={deleteProduct}
+              onSelect={setSelectedProduct}
+            />
           )}
 
           {!loading && !errorMessage && products.length === 0 && (

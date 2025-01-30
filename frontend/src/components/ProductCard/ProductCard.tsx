@@ -4,15 +4,21 @@ import {Product} from '../../types'
 type Props = {
   product: Product;
   onDelete: (id: number) => void;
+  onSelect: (product: Product) => void;
 }
 
-export const ProductCard: React.FC<Props> = ({product, onDelete}) => {
+export const ProductCard: React.FC<Props> = (
+  {
+    product,
+    onDelete = () => {},
+    onSelect = () => {},
+  }) => {
   return (
     <div className="card">
       <div className="card-image">
         <figure className="image is-aspect-ratio-1by1">
           <img
-            src={product.image_url ? product.image_url : "https://placehold.co/600x600"}
+            src={product.image_url ? product.image_url : 'https://placehold.co/600x600'}
             alt="Placeholder image"
           />
         </figure>
@@ -28,6 +34,12 @@ export const ProductCard: React.FC<Props> = ({product, onDelete}) => {
           {product.stock_value}{product.stock_unit.toLowerCase()}
         </p>
         <div className="buttons">
+          <button
+            className="icon button has-background-white is-info is-inverted"
+            onClick={() => onSelect(product)}
+          >
+            <i className="fas fa-pen"></i>
+          </button>
           <button
             className="icon button has-background-white is-danger is-inverted"
             onClick={() => onDelete(product.id)}

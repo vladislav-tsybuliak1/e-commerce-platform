@@ -35,8 +35,15 @@ const productSchema = z.object({
     .number({message: 'Price must be a valid number'})
     .gte(0, 'Price must be at least 0')
     .transform((price) => price * 100),
-  category_id: z.coerce.number().int().positive('Make a selection'),
-  brand_id: z.coerce.number({message: 'Make a selection'}).int().positive('Make a selection'),
+  category_id: z.coerce
+    .number({message: 'Make a selection'})
+    .int()
+    .positive('Make a selection'),
+  brand_id: z.coerce
+    .number({message: 'Make a selection'})
+    .int()
+    .positive('Make a selection'),
+  image_url: z.string(),
 }).superRefine((data, ctx) => {
   // If weight_product is false, stock_quantity must be an integer
   if (!data.weight_product && !Number.isInteger(data.stock_quantity)) {
@@ -61,10 +68,11 @@ type FormFields = z.infer<typeof productSchema>;
 
 type Props = {
   onSubmit: (product: Product) => void;
+  product?: Product;
 }
 
 export const ProductForm: React.FC<Props> = React.memo(
-  ({onSubmit}) => {
+  ({onSubmit, product}) => {
     const [categories, setCategories] = useState<Category[]>([]);
     const [brands, setBrands] = useState<Brand[]>([]);
 
@@ -79,6 +87,7 @@ export const ProductForm: React.FC<Props> = React.memo(
       reset,
       formState: {errors, isSubmitting, isSubmitSuccessful},
     } = useForm<FormFields>({
+      defaultValues: product ? {...product, price: product.price / 100} : {},
       resolver: zodResolver(productSchema),
     });
 
@@ -88,7 +97,7 @@ export const ProductForm: React.FC<Props> = React.memo(
 
         const newProduct: Product = {
           ...data,
-          id: 0,
+          id: product?.id || 0,
         };
 
         onSubmit(newProduct);
@@ -118,7 +127,8 @@ export const ProductForm: React.FC<Props> = React.memo(
     }, [reset, isSubmitSuccessful])
 
 
-    console.log('product form')
+    console.log('product form');
+    console.log(product);
     return (
       <form
         action=""
@@ -212,7 +222,11 @@ export const ProductForm: React.FC<Props> = React.memo(
                 id="product-stock-unit"
                 defaultValue=""
               >
-                <option value="" disabled={String(watch('stock_unit')) !== ''}>Select unit
+                <option
+                  value=""
+                  disabled={String(watch('stock_unit')) !== ''}
+                >
+                  Select unit
                 </option>
 
                 {units.map(value => (
@@ -319,34 +333,83 @@ export const ProductForm: React.FC<Props> = React.memo(
             Category
           </label>
 
-          <div className="control has-icons-left">
-            <div
-              className={classNames('select', {
-                'is-danger': errors.category_id
-              })}
-            >
-              <select
-                {...register('category_id')}
-                id="product-category-id"
-                defaultValue=""
-              >
-                <option value="" disabled={String(watch('category_id')) !== ''}>Select
-                  category
-                </option>
-
-                {categories.map(category => (
-                  <option
-                    value={category.id}
-                    key={category.id}
-                  >
-                    {category.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="icon is-small is-left">
-              <i className="fas fa-table"></i>
-            </div>
+          <div>
+            <Controller
+              name="category_id"
+              control={control}
+              render={({field}) => (
+                <ReactSelect
+                  {...field}
+                  id="product-category-id"
+                  options={categories.map((category) => ({
+                    value: category.id,
+                    label: category.name,
+                  }))}
+                  placeholder="Select category"
+                  onChange={(selectedOption) => field.onChange(selectedOption?.value ?? null)}
+                  value={
+                    categories
+                      .map((category) => ({
+                        value: category.id,
+                        label: category.name
+                      }))
+                      .find((option) => option.value === field.value) || null
+                  }
+                  isSearchable
+                  isClearable
+                  styles={{
+                    control: (provided, state) => ({
+                      ...provided,
+                      border: errors.category_id
+                        ? '1px solid hsl(348, 86%, 61%)'
+                        : state.menuIsOpen
+                          ? '1px solid hsl(217, 71%, 53%)'
+                          : '1px solid #dbdbdb',
+                      transition: 'box-shadow 0.2s ease-in-out',
+                      boxShadow: errors.category_id && state.menuIsOpen
+                        ? '0 0 0 3px hsl(348, 100%, 80%, 0.4)'
+                        : state.menuIsOpen
+                          ? '0 0 0 3px hsl(217, 71%, 53%, 0.25)'
+                          : 'none',
+                      cursor: 'pointer',
+                      '&:hover': {
+                        borderColor: errors.category_id
+                          ? 'hsl(348, 86%, 55%)'
+                          : state.menuIsOpen
+                            ? 'hsl(217, 71%, 50%)'
+                            : '#b5b5b5'
+                      }
+                    }),
+                    placeholder: (provided) => ({
+                      ...provided,
+                      color: errors.category_id ? 'hsl(348deg, 100%, 21%)' : 'hsl(0, 0%, 14%)',
+                    }),
+                    dropdownIndicator: (provided) => ({
+                      ...provided,
+                      color: 'hsl(217, 71%, 53%)',
+                    }),
+                    indicatorSeparator: () => ({
+                      display: 'none',
+                    }),
+                    option: (provided, state) => ({
+                      ...provided,
+                      backgroundColor: state.isFocused ? 'hsl(217, 71%, 53%)' : 'transparent',
+                      color: errors.category_id && !state.isFocused
+                        ? 'hsl(348deg, 100%, 21%)' :
+                        state.isFocused
+                          ? 'white'
+                          : 'hsl(0, 0%, 14%)',
+                      marginTop: '0',
+                    }),
+                    menu: (provided) => ({
+                      ...provided,
+                      marginTop: '0',
+                      borderRadius: '0.375rem',
+                    }),
+                  }}
+                />
+              )}
+            />
           </div>
 
           {errors.category_id && (
@@ -411,7 +474,7 @@ export const ProductForm: React.FC<Props> = React.memo(
                       color: 'hsl(217, 71%, 53%)',
                     }),
                     indicatorSeparator: () => ({
-                      display: 'none', // Remove the separator between the input and the arrow
+                      display: 'none',
                     }),
                     option: (provided, state) => ({
                       ...provided,
