@@ -3,9 +3,10 @@ import {Product} from '../../types'
 
 type Props = {
   product: Product;
+  onDelete: (id: number) => void;
 }
 
-export const ProductCard: React.FC<Props> = ({product}) => {
+export const ProductCard: React.FC<Props> = ({product, onDelete}) => {
   return (
     <div className="card">
       <div className="card-image">
@@ -26,7 +27,14 @@ export const ProductCard: React.FC<Props> = ({product}) => {
         <p className="title is-6">
           {product.stock_value}{product.stock_unit.toLowerCase()}
         </p>
-
+        <div className="buttons">
+          <button
+            className="icon button has-background-white is-danger is-inverted"
+            onClick={() => onDelete(product.id)}
+          >
+            <i className="fas fa-xmark"></i>
+          </button>
+        </div>
       </div>
     </div>
   );

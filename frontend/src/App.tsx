@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {Product} from './types';
 import {getProducts} from './services/product';
 import {Loader} from './components/Loader';
@@ -11,6 +11,8 @@ export const App: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [updatedAt, setUpdatedAt] = useState(new Date());
 
+  const [counter, setCounter] = useState(0)
+
   useEffect(() => {
       setLoading(true);
       getProducts()
@@ -20,9 +22,15 @@ export const App: React.FC = () => {
     }, [updatedAt]
   )
 
-  const addProduct = (newProduct: Product) => {
-    setProducts(currentProducts => [newProduct, ...currentProducts])
-  };
+  const addProduct = useCallback((newProduct: Product) => {
+      setProducts(currentProducts => [newProduct, ...currentProducts])
+    }, []
+  );
+
+  const deleteProduct = useCallback((productId: number) => {
+      setProducts(currentProducts => currentProducts.filter(product => product.id !== productId));
+    }, []
+  );
 
   function reload() {
     setUpdatedAt(new Date());
@@ -36,6 +44,10 @@ export const App: React.FC = () => {
         <ProductForm onSubmit={addProduct}/>
       </div>
 
+      <button onClick={() => setCounter(x => x + 1)}>
+        {counter}
+      </button>
+
 
       <div>
         <p className="title is-2">Products</p>
@@ -43,7 +55,7 @@ export const App: React.FC = () => {
           {loading && <Loader/>}
 
           {!loading && products.length > 0 && (
-            <ProductList products={products}/>
+            <ProductList products={products} onDelete={deleteProduct}/>
           )}
 
           {!loading && !errorMessage && products.length === 0 && (
