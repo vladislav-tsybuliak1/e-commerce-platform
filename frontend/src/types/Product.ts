@@ -10,6 +10,6 @@ export interface Product {
   stock_quantity: number;
   price: number;
   image_url?: string;
-  category_id: string;
-  brand_id: string;
+  category_id: number;
+  brand_id: number;
 }
