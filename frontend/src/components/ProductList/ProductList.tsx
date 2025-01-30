@@ -8,6 +8,7 @@ type Props = {
 
 export const ProductList: React.FC<Props> = React.memo(
   ({products}) => {
+    console.log('product list')
     return (
       <div className="grid is-col-min-11">
         {products.map(product => (

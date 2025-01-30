@@ -98,6 +98,7 @@ export const ProductForm: React.FC = React.memo(
       }, []
     );
 
+    console.log('product form')
     return (
       <form
         action=""
