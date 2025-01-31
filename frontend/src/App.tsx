@@ -62,15 +62,18 @@ export const App: React.FC = () => {
   );
 
   const updateProduct = useCallback((updatedProduct: Product) => {
-      setProducts(currentProducts => {
-        const newProducts = [...currentProducts];
-        const index = newProducts.findIndex(product => product.id === updatedProduct.id);
+      productService.updateProduct(updatedProduct).then(
+        product => {
+          setProducts(currentProducts => {
+            const newProducts = [...currentProducts];
+            const index = newProducts.findIndex(product => product.id === updatedProduct.id);
 
-        newProducts.splice(index, 1, updatedProduct);
+            newProducts.splice(index, 1, product);
 
-        return newProducts;
-      });
-
+            return newProducts;
+          });
+        }
+      );
       setSelectedProduct(null);
     }, []
   );

@@ -15,3 +15,10 @@ export async function createProduct(
 ) {
   return client.post<Product, typeof product>('/products/', product);
 }
+
+export async function updateProduct(
+  product: Omit<Product, 'image'>
+) {
+  const { id, ...data } = product;
+  return client.put<Product, Omit<typeof product, 'id'>>(`/products/${id}/`, data);
+}

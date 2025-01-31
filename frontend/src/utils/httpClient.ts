@@ -1,6 +1,10 @@
 export const HOST_URL = 'http://127.0.0.1:8000';
 export const BASE_URL = `${HOST_URL}/api/v1`;
 
+const DEFAULT_HEADERS = {
+  'Content-Type': 'application/json; charset=utf-8',
+}
+
 const handleResponse = (response: Response) => {
     if (!response.ok) {
       throw new Error(`${response.status} ${response.statusText}`)
@@ -17,9 +21,16 @@ export const client = {
   post<T, U = unknown>(url: string, data: U): Promise<T> {
     const options = {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json; charset=utf-8',
-      },
+      headers: DEFAULT_HEADERS,
+      body: JSON.stringify(data)
+    };
+    return fetch(BASE_URL + url, options)
+      .then(handleResponse);
+  },
+  put<T, U = unknown>(url: string, data: U): Promise<T> {
+    const options = {
+      method: 'PUT',
+      headers: DEFAULT_HEADERS,
       body: JSON.stringify(data)
     };
     return fetch(BASE_URL + url, options)
