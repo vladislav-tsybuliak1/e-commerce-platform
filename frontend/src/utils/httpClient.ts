@@ -18,7 +18,20 @@ async function request<T>(
   const response = await fetch(BASE_URL + url, options);
 
   if (!response.ok) {
-    throw new Error(`Failed to ${method} ${url}: ${response.status} ${response.statusText}`);
+    let errorMessage = `Failed to ${method} ${url}: ${response.status} ${response.statusText}`;
+
+    try {
+      const errorData = await response.json();
+      if (errorData?.detail) {
+        if (typeof errorData.detail === 'string') {
+          errorMessage = errorData.detail
+        }
+      }
+    } catch {
+      // Ignore JSON parsing errors and keep default error message
+    }
+
+    throw new Error(errorMessage);
   }
 
   return response.status !== 204 ? response.json() : undefined as T;

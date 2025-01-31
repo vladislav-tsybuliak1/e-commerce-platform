@@ -106,8 +106,7 @@ export const ProductForm: React.FC<Props> = React.memo(
         };
         await onSubmit(newProduct);
       } catch (error) {
-        console.error(error);
-        setError('root', {message: 'Failed to submit the form'});
+        setError('root', {message: (error as Error).message || 'Failed to submit the form'});
       }
     };
 
