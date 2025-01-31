@@ -1,8 +1,10 @@
 import React from 'react';
 import {Product} from '../../types'
+import classNames from 'classnames';
 
 type Props = {
   product: Product;
+  selectedProductId?: number;
   onDelete: (id: number) => void;
   onSelect: (product: Product) => void;
 }
@@ -10,11 +12,16 @@ type Props = {
 export const ProductCard: React.FC<Props> = (
   {
     product,
-    onDelete = () => {},
-    onSelect = () => {},
+    selectedProductId,
+    onDelete = () => {
+    },
+    onSelect = () => {
+    },
   }) => {
   return (
-    <div className="card">
+    <div className={classNames('card', {
+      'has-background-info': product.id === selectedProductId,
+    })}>
       <div className="card-image">
         <figure className="image is-aspect-ratio-1by1">
           <img

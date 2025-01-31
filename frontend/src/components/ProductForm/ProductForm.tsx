@@ -21,8 +21,9 @@ const productSchema = z.object({
     .trim()
     .max(1000, 'Description must be at most 1000 characters')
     .transform((value) => (
-      value === '' ? undefined : value
-    )),
+      (value === '' || value === undefined) ? null : value
+    ))
+    .nullable(),
   stock_unit: z.nativeEnum(StockUnit, {message: 'Make a selection'}),
   weight_product: z.boolean(),
   stock_value: z.coerce
@@ -43,7 +44,6 @@ const productSchema = z.object({
     .number({message: 'Make a selection'})
     .int()
     .positive('Make a selection'),
-  image_url: z.string(),
 }).superRefine((data, ctx) => {
   // If weight_product is false, stock_quantity must be an integer
   if (!data.weight_product && !Number.isInteger(data.stock_quantity)) {
@@ -68,11 +68,17 @@ type FormFields = z.infer<typeof productSchema>;
 
 type Props = {
   onSubmit: (product: Product) => void;
+  onReset?: () => void;
   product?: Product;
 }
 
 export const ProductForm: React.FC<Props> = React.memo(
-  ({onSubmit, product}) => {
+  ({
+     onSubmit,
+     product,
+     onReset = () => {
+     }
+   }) => {
     const [categories, setCategories] = useState<Category[]>([]);
     const [brands, setBrands] = useState<Brand[]>([]);
 
@@ -98,6 +104,7 @@ export const ProductForm: React.FC<Props> = React.memo(
         const newProduct: Product = {
           ...data,
           id: product?.id || 0,
+          image_url: product?.image_url || null,
         };
 
         onSubmit(newProduct);
@@ -134,7 +141,10 @@ export const ProductForm: React.FC<Props> = React.memo(
         action=""
         className="box"
         onSubmit={handleSubmit(handleProductSubmit)}
-        onReset={() => reset()}
+        onReset={() => {
+          reset();
+          onReset();
+        }}
       >
 
         <div className="field">

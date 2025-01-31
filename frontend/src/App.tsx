@@ -41,7 +41,9 @@ export const App: React.FC = () => {
         newProducts.splice(index, 1, updatedProduct);
 
         return newProducts;
-      })
+      });
+
+      setSelectedProduct(null);
     }, []
   );
 
@@ -60,7 +62,9 @@ export const App: React.FC = () => {
           <ProductForm
             onSubmit={updateProduct}
             product={selectedProduct}
-            key={selectedProduct.id}/>
+            key={selectedProduct.id}
+            onReset={() => setSelectedProduct(null)}
+          />
         ) : (
           <ProductForm onSubmit={addProduct}/>
         )}
@@ -81,6 +85,7 @@ export const App: React.FC = () => {
               products={products}
               onDelete={deleteProduct}
               onSelect={setSelectedProduct}
+              selectedProductId={selectedProduct?.id}
             />
           )}
 
