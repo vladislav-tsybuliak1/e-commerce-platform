@@ -1,24 +1,23 @@
 import {Product} from '../types';
 import {client} from '../utils/httpClient';
 
-export async function getProducts() {
-  return client.get<Product[]>('/products/')
-    .then((products) => (products));
+export async function getProducts(): Promise<Product[]> {
+  return await client.get<Product[]>('/products/')
 }
 
-export async function deleteProduct(productId: number) {
-  return client.delete<null>(`/products/${productId}/`)
+export async function deleteProduct(productId: number): Promise<void> {
+  return client.delete<void>(`/products/${productId}/`)
 }
 
 export async function createProduct(
   product: Omit<Product, 'id' | 'image'>
-) {
-  return client.post<Product, typeof product>('/products/', product);
+): Promise<Product> {
+  return await client.post<Product>('/products/', product);
 }
 
 export async function updateProduct(
   product: Omit<Product, 'image'>
-) {
-  const { id, ...data } = product;
-  return client.put<Product, Omit<typeof product, 'id'>>(`/products/${id}/`, data);
+): Promise<Product> {
+  const {id, ...data} = product;
+  return await client.put<Product>(`/products/${id}/`, data);
 }

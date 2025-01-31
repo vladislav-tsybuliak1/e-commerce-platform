@@ -37,44 +37,61 @@ export const App: React.FC = () => {
 
   const [counter, setCounter] = useState(0)
 
+  const fetchProducts = useCallback(() => {
+    setLoading(true);
+    productService.getProducts()
+      .then(setProducts)
+      .catch(() => setErrorMessage('Try again later'))
+      .finally(() => setLoading(false));
+  }, []);
+
   useEffect(() => {
-      setLoading(true);
-      productService.getProducts()
-        .then(setProducts)
-        .catch(() => setErrorMessage('Try again later'))
-        .finally(() => setLoading(false))
-    }, [updatedAt]
-  )
+    fetchProducts();
+  }, [fetchProducts, updatedAt]);
 
-  const addProduct = useCallback((newProduct: Product) => {
-      productService.createProduct(newProduct).then(
-        addedProduct => {
-          setProducts(currentProducts => [addedProduct, ...currentProducts])
-        }
-      );
+  const addProduct = useCallback(async (newProduct: Product) => {
+      setErrorMessage('');
+
+      try {
+        const addedProduct = await productService.createProduct(newProduct);
+        setProducts(currentProducts => [addedProduct, ...currentProducts]);
+      } catch (error) {
+        console.error(error);
+        setErrorMessage('Error while adding a product');
+        throw error;
+      }
     }, []
   );
 
-  const deleteProduct = useCallback((productId: number) => {
-      productService.deleteProduct(productId).then();
-      setProducts(currentProducts => currentProducts.filter(product => product.id !== productId));
+  const deleteProduct = useCallback(async (productId: number) => {
+      setErrorMessage('');
+
+      try {
+        await productService.deleteProduct(productId);
+        setProducts(currentProducts => currentProducts.filter(product => product.id !== productId));
+      } catch (error) {
+        console.error(error);
+        setErrorMessage('Error while deleting a product')
+      }
     }, []
   );
 
-  const updateProduct = useCallback((updatedProduct: Product) => {
-      productService.updateProduct(updatedProduct).then(
-        product => {
-          setProducts(currentProducts => {
-            const newProducts = [...currentProducts];
-            const index = newProducts.findIndex(product => product.id === updatedProduct.id);
-
-            newProducts.splice(index, 1, product);
-
-            return newProducts;
-          });
-        }
-      );
-      setSelectedProduct(null);
+  const updateProduct = useCallback(async (updatedProduct: Product) => {
+      setErrorMessage('');
+      try {
+        const product = await productService.updateProduct(updatedProduct);
+        setProducts((currentProducts) => {
+          const newProducts = [...currentProducts];
+          const index = newProducts.findIndex((p) => p.id === updatedProduct.id);
+          newProducts.splice(index, 1, product);
+          return newProducts;
+        });
+        setSelectedProduct(null);
+      } catch (error) {
+        console.error(error);
+        setErrorMessage('Error while deleting a product')
+        throw error;
+      }
     }, []
   );
 
@@ -82,8 +99,6 @@ export const App: React.FC = () => {
     setUpdatedAt(new Date());
     setErrorMessage('');
   }
-
-  console.log(products);
 
   return (
     <div>

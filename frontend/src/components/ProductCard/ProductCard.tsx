@@ -6,7 +6,7 @@ import {HOST_URL} from '../../utils/httpClient';
 type Props = {
   product: Product;
   selectedProductId?: number;
-  onDelete: (id: number) => void;
+  onDelete: (id: number) => Promise<void>;
   onSelect: (product: Product) => void;
 }
 
@@ -14,8 +14,7 @@ export const ProductCard: React.FC<Props> = (
   {
     product,
     selectedProductId,
-    onDelete = () => {
-    },
+    onDelete,
     onSelect = () => {
     },
   }) => {

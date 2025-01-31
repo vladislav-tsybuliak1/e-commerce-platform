@@ -5,7 +5,7 @@ import {Product} from '../../types';
 type Props = {
   products: Product[];
   selectedProductId?: number;
-  onDelete?: (id: number) => void;
+  onDelete: (id: number) => Promise<void>;
   onSelect?: (product: Product) => void;
 };
 
@@ -13,8 +13,7 @@ export const ProductList: React.FC<Props> = React.memo(
   ({
      products,
      selectedProductId,
-     onDelete = () => {
-     },
+     onDelete,
      onSelect = () => {
      },
    }) => {
@@ -25,7 +24,8 @@ export const ProductList: React.FC<Props> = React.memo(
           {products.map(product => (
             <div className="cell" key={product.id}>
               <ProductCard
-                product={product} onDelete={onDelete}
+                product={product}
+                onDelete={onDelete}
                 onSelect={onSelect}
                 selectedProductId={selectedProductId}
               />

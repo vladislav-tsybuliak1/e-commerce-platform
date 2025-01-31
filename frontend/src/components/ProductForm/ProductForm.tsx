@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {SubmitHandler, useForm, Controller} from 'react-hook-form';
 import ReactSelect from 'react-select';
 import {zodResolver} from '@hookform/resolvers/zod';
@@ -67,7 +67,7 @@ const productSchema = z.object({
 type FormFields = z.infer<typeof productSchema>;
 
 type Props = {
-  onSubmit: (product: Product) => void;
+  onSubmit: (product: Product) => Promise<void>;
   onReset?: () => void;
   product?: Product;
 }
@@ -99,32 +99,35 @@ export const ProductForm: React.FC<Props> = React.memo(
 
     const handleProductSubmit: SubmitHandler<FormFields> = async (data) => {
       try {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-
         const newProduct: Product = {
           ...data,
           id: product?.id || 0,
           image: product?.image || null,
         };
-
-        onSubmit(newProduct);
-
+        await onSubmit(newProduct);
       } catch (error) {
-        setError('root', {message: String(error)})
+        console.error(error);
+        setError('root', {message: 'Failed to submit the form'});
       }
     };
 
+    const fetchBrandsAndCategories = useCallback(async () => {
+      try {
+        const [brandsData, categoriesData] = await Promise.all([getBrands(), getCategories()]);
+        setBrands(brandsData);
+        setCategories(categoriesData);
+      } catch (error) {
+        console.error(error);
+        setError('root', {message: 'Failed to fetch brands or categories'});
+      }
+    }, [setError]);
+
     useEffect(() => {
-        getBrands()
-          .then(setBrands)
-          .catch()
-          .finally();
-        getCategories()
-          .then(setCategories)
-          .catch()
-          .finally();
-      }, []
-    );
+      fetchBrandsAndCategories()
+        .catch(error => {
+          console.error(error);
+        });
+    }, [fetchBrandsAndCategories]);
 
     useEffect(() => {
       if (isSubmitSuccessful) {
@@ -507,12 +510,19 @@ export const ProductForm: React.FC<Props> = React.memo(
         </div>
 
         <div className="buttons">
-          <button disabled={isSubmitting} type="submit"
-                  className="button is-link">
+          <button
+            disabled={isSubmitting}
+            type="submit"
+            className="button is-link"
+          >
             {isSubmitting ? 'Loading...' : 'Submit'}
           </button>
 
-          <button type="reset" className="button is-link is-light">
+          <button
+            disabled={isSubmitting}
+            type="reset"
+            className="button is-link is-light"
+          >
             Cancel
           </button>
         </div>
