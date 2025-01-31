@@ -7,5 +7,11 @@ export async function getProducts() {
 }
 
 export async function deleteProduct(productId: number) {
-  return client.delete<Product[]>(`/products/${productId}/`)
+  return client.delete<null>(`/products/${productId}/`)
+}
+
+export async function createProduct(
+  product: Omit<Product, 'id' | 'image_url'>
+) {
+  return client.post<Product, typeof product>('/products/', product);
 }

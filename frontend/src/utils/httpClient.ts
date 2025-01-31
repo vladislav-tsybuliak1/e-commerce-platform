@@ -13,6 +13,17 @@ export const client = {
     return fetch(BASE_URL + url)
       .then(handleResponse);
   },
+  post<T, U = unknown>(url: string, data: U): Promise<T> {
+    const options = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+      },
+      body: JSON.stringify(data)
+    };
+    return fetch(BASE_URL + url, options)
+      .then(handleResponse);
+  },
   delete<T>(url: string): Promise<T> {
     return fetch(BASE_URL + url, {method: 'DELETE'})
       .then(handleResponse)

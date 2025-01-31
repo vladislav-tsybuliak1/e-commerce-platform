@@ -47,7 +47,11 @@ export const App: React.FC = () => {
   )
 
   const addProduct = useCallback((newProduct: Product) => {
-      setProducts(currentProducts => [newProduct, ...currentProducts])
+      productService.createProduct(newProduct).then(
+        addedProduct => {
+          setProducts(currentProducts => [addedProduct, ...currentProducts])
+        }
+      );
     }, []
   );
 
