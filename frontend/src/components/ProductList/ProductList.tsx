@@ -20,16 +20,18 @@ export const ProductList: React.FC<Props> = React.memo(
    }) => {
     console.log('product list')
     return (
-      <div className="grid is-col-min-11">
-        {products.map(product => (
-          <div className="cell" key={product.id}>
-            <ProductCard
-              product={product} onDelete={onDelete}
-              onSelect={onSelect}
-              selectedProductId={selectedProductId}
-            />
-          </div>
-        ))}
+      <div className="fixed-grid has-4-cols">
+        <div className="grid is-col-min-11">
+          {products.map(product => (
+            <div className="cell" key={product.id}>
+              <ProductCard
+                product={product} onDelete={onDelete}
+                onSelect={onSelect}
+                selectedProductId={selectedProductId}
+              />
+            </div>
+          ))}
+        </div>
       </div>
     );
   }

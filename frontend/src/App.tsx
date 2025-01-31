@@ -1,9 +1,22 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import debounce from 'lodash.debounce';
+
 import {Product} from './types';
 import {getProducts} from './services/product';
 import {Loader} from './components/Loader';
 import {ProductList} from './components/ProductList';
 import {ProductForm} from './components/ProductForm';
+
+// function debounce(callback: Function, delay: number) {
+//   let timerId = 0;
+//   return (...args: any) => {
+//     window.clearTimeout(timerId);
+//
+//     timerId = window.setTimeout(() => {
+//       callback(...args);
+//     }, delay);
+//   };
+// }
 
 export const App: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -11,6 +24,27 @@ export const App: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [updatedAt, setUpdatedAt] = useState(new Date());
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+
+  const [query, setQuery] = useState('');
+  const [appliedQuery, setAppliedQuery] = useState('')
+
+  const debouncedSetQuery = useMemo(
+    () => debounce(setAppliedQuery, 1000),
+    [setAppliedQuery],
+  );
+
+  const applyQuery = useCallback((query: string) => {
+    debouncedSetQuery(query);
+  }, [debouncedSetQuery]);
+
+  const handleQueryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setQuery(event.target.value);
+    applyQuery(event.target.value);
+  };
+
+  const filteredProducts = useMemo(() => (
+    products.filter(product => product.name.toLowerCase().includes(appliedQuery.toLowerCase()))
+  ), [appliedQuery, products])
 
   const [counter, setCounter] = useState(0)
 
@@ -76,20 +110,32 @@ export const App: React.FC = () => {
 
 
       <div>
-        <p className="title is-2">Products</p>
+        <div className="columns">
+          <div className="column">
+            <p className="title is-2">Products</p>
+          </div>
+          <div className="column">
+            <input
+              type="text"
+              className="input is-rounded"
+              value={query}
+              onChange={handleQueryChange}
+            />
+          </div>
+        </div>
         <div>
           {loading && <Loader/>}
 
-          {!loading && products.length > 0 && (
+          {!loading && filteredProducts.length > 0 && (
             <ProductList
-              products={products}
+              products={filteredProducts}
               onDelete={deleteProduct}
               onSelect={setSelectedProduct}
               selectedProductId={selectedProduct?.id}
             />
           )}
 
-          {!loading && !errorMessage && products.length === 0 && (
+          {!loading && !errorMessage && filteredProducts.length === 0 && (
             <p className="title is-5">There are no products</p>
           )}
 
