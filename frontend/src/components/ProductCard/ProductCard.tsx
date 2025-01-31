@@ -1,6 +1,7 @@
 import React from 'react';
 import {Product} from '../../types'
 import classNames from 'classnames';
+import {HOST_URL} from '../../utils/httpClient';
 
 type Props = {
   product: Product;
@@ -25,7 +26,7 @@ export const ProductCard: React.FC<Props> = (
       <div className="card-image">
         <figure className="image is-aspect-ratio-1by1">
           <img
-            src={product.image_url ? product.image_url : 'https://placehold.co/600x600'}
+            src={product.image ? `${HOST_URL}/${product.image}` : 'https://placehold.co/600x600'}
             alt="Placeholder image"
           />
         </figure>

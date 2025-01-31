@@ -1,4 +1,6 @@
 import {StockUnit} from './StockUnit';
+import {Category} from './Category';
+import {Brand} from './Brand';
 
 export interface Product {
   id: number;
@@ -9,7 +11,9 @@ export interface Product {
   stock_value: number;
   stock_quantity: number;
   price: number;
-  image_url: string | null;
+  image: string | null;
   category_id: number;
   brand_id: number;
+  category?: Category;
+  brand?: Brand;
 }

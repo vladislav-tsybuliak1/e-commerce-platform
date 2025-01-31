@@ -11,7 +11,7 @@ export async function deleteProduct(productId: number) {
 }
 
 export async function createProduct(
-  product: Omit<Product, 'id' | 'image_url'>
+  product: Omit<Product, 'id' | 'image'>
 ) {
   return client.post<Product, typeof product>('/products/', product);
 }

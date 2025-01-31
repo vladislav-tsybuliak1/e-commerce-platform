@@ -1,4 +1,5 @@
-const BASE_URL = 'http://127.0.0.1:8000/api/v1';
+export const HOST_URL = 'http://127.0.0.1:8000';
+export const BASE_URL = `${HOST_URL}/api/v1`;
 
 const handleResponse = (response: Response) => {
     if (!response.ok) {

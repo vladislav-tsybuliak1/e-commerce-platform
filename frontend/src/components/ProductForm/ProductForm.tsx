@@ -104,11 +104,10 @@ export const ProductForm: React.FC<Props> = React.memo(
         const newProduct: Product = {
           ...data,
           id: product?.id || 0,
-          image_url: product?.image_url || null,
+          image: product?.image || null,
         };
 
         onSubmit(newProduct);
-        console.log(data);
 
       } catch (error) {
         setError('root', {message: String(error)})
@@ -133,9 +132,6 @@ export const ProductForm: React.FC<Props> = React.memo(
       }
     }, [reset, isSubmitSuccessful])
 
-
-    console.log('product form');
-    console.log(product);
     return (
       <form
         action=""
