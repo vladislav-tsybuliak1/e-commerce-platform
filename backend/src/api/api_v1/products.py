@@ -7,7 +7,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from core.models import db_helper, Product
 from core.schemas.product import (
     ProductCreateUpdate,
-    ProductResponse,
     ProductListRead,
     ProductDetailRead,
 )
@@ -24,40 +23,23 @@ router = APIRouter(tags=["Products"])
 @router.get("/", response_model=list[ProductListRead])
 async def get_products(
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
-    request: Request,
 ):
-    products = await crud.get_products(session=session)
-
-    base_url = str(request.base_url)
-
-    product_list = []
-
-    for product in products:
-        image_url = None
-        if product.image:
-            image_url = urljoin(base_url, product.image)
-        product.image_url = image_url
-        product_list.append(
-            ProductListRead.model_validate(product)
-        )
-
-    return product_list
+    return await crud.get_products(session=session)
 
 
 @router.post(
     "/",
-    response_model=ProductResponse,
+    response_model=ProductListRead,
     status_code=status.HTTP_201_CREATED,
 )
 async def create_product(
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
     product_create: ProductCreateUpdate,
 ):
-    product = await crud.create_product(
+    return await crud.create_product(
         session=session,
         product_create=product_create,
     )
-    return product
 
 
 @router.get("/{product_id}/", response_model=ProductDetailRead)
@@ -68,17 +50,8 @@ async def get_product(
             get_product_by_id_with_related_models,
         ),
     ],
-    request: Request,
 ):
-    base_url = str(request.base_url)
-
-    image_url = None
-    if product.image:
-        image_url = urljoin(base_url, product.image)
-
-    product.image_url = image_url
-
-    return ProductDetailRead.model_validate(product)
+    return product
 
 
 @router.delete("/{product_id}/", status_code=status.HTTP_204_NO_CONTENT)
@@ -89,7 +62,7 @@ async def delete_product(
     await crud.delete_product(session=session, product=product)
 
 
-@router.put("/{product_id}/", response_model=ProductResponse)
+@router.put("/{product_id}/", response_model=ProductListRead)
 async def update_product(
     session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
     product: Annotated[Product, Depends(get_product_by_id)],
@@ -119,10 +92,7 @@ async def upload_product_image(
         image=image,
     )
 
-    base_url = str(request.base_url)
-    image_url = urljoin(base_url, file_path)
-
-    return {"message": "Image uploaded successfully", "file_path": image_url}
+    return {"message": "Image uploaded successfully", "file_path": file_path}
 
 
 @router.delete("/{product_id}/delete-image/", status_code=status.HTTP_204_NO_CONTENT)

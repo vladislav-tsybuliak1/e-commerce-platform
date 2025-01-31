@@ -30,7 +30,7 @@ class ProductListRead(ProductBase):
     )
 
     id: int
-    image_url: str | None
+    image: str | None
     category_id: int
     brand_id: int
 
@@ -41,20 +41,9 @@ class ProductDetailRead(ProductBase):
     )
 
     id: int
-    image_url: str | None
+    image: str | None
     category: CategoryRead
     brand: BrandRead
-
-
-class ProductResponse(ProductBase):
-    model_config = ConfigDict(
-        from_attributes=True,
-    )
-
-    id: int
-    image: str | None
-    category_id: int
-    brand_id: int
 
 
 class ProductImageUpload(BaseModel):
