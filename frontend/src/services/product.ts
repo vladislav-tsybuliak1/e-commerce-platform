@@ -1,7 +1,11 @@
 import {Product} from '../types';
-import {getData} from '../utils/httpClient';
+import {client} from '../utils/httpClient';
 
 export async function getProducts() {
-  return getData<Product[]>('/products/')
+  return client.get<Product[]>('/products/')
     .then((products) => (products));
+}
+
+export async function deleteProduct(productId: number) {
+  return client.delete<Product[]>(`/products/${productId}/`)
 }

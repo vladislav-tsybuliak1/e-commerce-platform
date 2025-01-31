@@ -1,7 +1,7 @@
 import {Brand} from '../types';
-import {getData} from '../utils/httpClient';
+import {client} from '../utils/httpClient';
 
 export async function getBrands() {
-  return getData<Brand[]>('/brands/')
+  return client.get<Brand[]>('/brands/')
     .then((brands) => (brands));
 }

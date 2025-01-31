@@ -1,7 +1,7 @@
 import {Category} from '../types';
-import {getData} from '../utils/httpClient';
+import {client} from '../utils/httpClient';
 
 export async function getCategories() {
-  return getData<Category[]>('/categories/')
+  return client.get<Category[]>('/categories/')
     .then((categories) => (categories));
 }

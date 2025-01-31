@@ -2,21 +2,10 @@ import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import debounce from 'lodash.debounce';
 
 import {Product} from './types';
-import {getProducts} from './services/product';
+import * as productService from './services/product';
 import {Loader} from './components/Loader';
 import {ProductList} from './components/ProductList';
 import {ProductForm} from './components/ProductForm';
-
-// function debounce(callback: Function, delay: number) {
-//   let timerId = 0;
-//   return (...args: any) => {
-//     window.clearTimeout(timerId);
-//
-//     timerId = window.setTimeout(() => {
-//       callback(...args);
-//     }, delay);
-//   };
-// }
 
 export const App: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -50,7 +39,7 @@ export const App: React.FC = () => {
 
   useEffect(() => {
       setLoading(true);
-      getProducts()
+      productService.getProducts()
         .then(setProducts)
         .catch(() => setErrorMessage('Try again later'))
         .finally(() => setLoading(false))
@@ -63,6 +52,7 @@ export const App: React.FC = () => {
   );
 
   const deleteProduct = useCallback((productId: number) => {
+      productService.deleteProduct(productId).then();
       setProducts(currentProducts => currentProducts.filter(product => product.id !== productId));
     }, []
   );
